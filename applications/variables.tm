@@ -1,4 +1,4 @@
-generate_hcl "_auto_generated_variable.tf" {
+generate_hcl "_auto_generated_variables.tf" {
   content {
     variable "app_name" {
       type        = string
