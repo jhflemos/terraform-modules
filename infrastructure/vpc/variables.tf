@@ -4,6 +4,11 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
+variable "vpc_name" {
+  type        = string
+  description = "VPC name"
+}
+
  variable "tags" {
    type        = map(string)
    default     = {}
