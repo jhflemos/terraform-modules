@@ -25,10 +25,10 @@ generate_hcl "_auto_generated_ecr.tf" {
                 "rulePriority": 1,
                 "description": "Keep last 15 images",
                 "selection": {
-                    "tagStatus"     = "tagged",
-                    "tagPrefixList" = ["main-"],
-                    "countType"     = "imageCountMoreThan",
-                    "countNumber"   = 15
+                    "tagStatus": "tagged",
+                    "tagPrefixList": ["main-"],
+                    "countType": "imageCountMoreThan",
+                    "countNumber": 15
                 },
                 "action": {
                     "type": "expire"
@@ -38,9 +38,9 @@ generate_hcl "_auto_generated_ecr.tf" {
                 "rulePriority": 2,
                 "description": "Keep last 5 images for dev environment",
                 "selection": {
-                    "tagStatus"     = "untagged",
-                    "countType"     = "imageCountMoreThan",
-                    "countNumber"   = 3
+                    "tagStatus": "untagged",
+                    "countType": "imageCountMoreThan",
+                    "countNumber": 3
                 },
                 "action": {
                     "type": "expire"
@@ -50,10 +50,10 @@ generate_hcl "_auto_generated_ecr.tf" {
                 "rulePriority": 3,
                 "description": "Remove untagged images",
                 "selection": {
-                    "tagStatus"     = "tagged",
-                    "tagPrefixList" = ["dev-", "test-"],
-                    "countType"     = "imageCountMoreThan",
-                    "countNumber"   = 5
+                    "tagStatus": "tagged",
+                    "tagPrefixList": ["dev-", "test-"],
+                    "countType": "imageCountMoreThan",
+                    "countNumber": 5
                 },
                 "action": {
                     "type": "expire"
