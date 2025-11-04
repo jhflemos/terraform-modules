@@ -4,7 +4,7 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "vpc_name" {
+variable "name" {
   type        = string
   description = "VPC name"
 }
