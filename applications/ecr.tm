@@ -2,7 +2,7 @@ generate_hcl "_auto_generated_ecr.tf" {
   content {
     resource "aws_ecr_repository" "app_ecr_repo" {
 
-      name                 = "$${var.environment}-$${var.app_name}"
+      name                 = "${var.environment}-${var.app_name}"
       image_tag_mutability = "MUTABLE"
 
       image_scanning_configuration {
