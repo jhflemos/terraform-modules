@@ -36,6 +36,11 @@ generate_hcl "_auto_generated_variables.tf" {
       description = ""
     }
 
+    variable "aws_acm_certificate_arn" {
+      type        = string
+      description = ""
+    }
+
     variable "private_subnets" {
       type        = list(string)
       description = "A list of private subnets"
@@ -55,6 +60,5 @@ generate_hcl "_auto_generated_variables.tf" {
         name = string
       }))
     }
-    
   }
 }

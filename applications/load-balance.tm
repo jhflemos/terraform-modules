@@ -17,10 +17,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "http" {
+    resource "aws_lb_listener" "https" {
       load_balancer_arn = var.alb_arn
-      port              = 80
-      protocol          = "HTTP"
+      port              = "443"
+      protocol          = "HTTPS"
+      ssl_policy        = "ELBSecurityPolicy-2016-08"
+      certificate_arn   = var.aws_acm_certificate_arn
 
       default_action {
         type             = "forward"
@@ -28,5 +30,20 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
+    resource "aws_lb_listener" "http" {
+      load_balancer_arn = var.alb_arn
+      port              = 80
+      protocol          = "HTTP"
+
+      default_action {
+        type = "redirect"
+
+        redirect {
+          port        = "443"
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
+        }
+      }
+    }
   }
 }

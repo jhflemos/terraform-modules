@@ -60,5 +60,10 @@ generate_hcl "_auto_generated_iam.tf" {
       policy_arn = aws_iam_policy.ecs_ssm_policy.arn
     }
 
+    resource "aws_iam_role_policy_attachment" "ecs_task_execution_ssm_attach" {
+      role       = aws_iam_role.ecs_task_execution.name
+      policy_arn = aws_iam_policy.ecs_ssm_policy.arn
+    }
+
   }
 }
