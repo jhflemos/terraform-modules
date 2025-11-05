@@ -15,5 +15,10 @@ generate_hcl "_auto_generated_variables.tf" {
       type        = string
       description = "Environment which the module is being currently run in i.e. dev or prod"
     }
+
+    variable "kms" {
+      type    = any
+      default = {}
+    } 
   }
 }

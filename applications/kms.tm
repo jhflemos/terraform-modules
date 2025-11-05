@@ -47,7 +47,10 @@ generate_hcl "_auto_generated_kms.tf" {
         }
       }
 
-      tags = local.tags_app_module
+      tags = {
+        Name        = var.app_name
+        Environment = var.environment
+      }
     }
   }
 }
