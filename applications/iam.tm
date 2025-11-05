@@ -54,15 +54,13 @@ generate_hcl "_auto_generated_iam.tf" {
           {
             Effect = "Allow"
             Action = [
-              "kms"
+              "kms:*"
             ]
             Resource = aws_kms_key.app_kms_key.arn
           }
         ]
       })
     }
-
-
 
     resource "aws_iam_role_policy_attachment" "ecs_task_ssm_attach" {
       role       = aws_iam_role.ecs_task.name
