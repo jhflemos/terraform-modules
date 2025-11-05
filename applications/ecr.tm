@@ -16,7 +16,7 @@ generate_hcl "_auto_generated_ecr.tf" {
 
       encryption_configuration {
        encryption_type = "KMS"
-       kms_key         = "app/${var.environment}/${var.app_name}"
+       kms_key         = module.kms.arn
       }
 
       tags = {
