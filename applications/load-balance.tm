@@ -1,4 +1,4 @@
-generate_hcl "_auto_generated_lb.tf" {
+generate_hcl "_auto_generated_load_balance.tf" {
   content {
     resource "aws_lb_target_group" "app_lb_service_tg" {
       name        = "${var.app_name}-service-tg"

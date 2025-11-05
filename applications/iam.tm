@@ -10,6 +10,14 @@ generate_hcl "_auto_generated_iam.tf" {
             Action    = "sts:AssumeRole",
             Effect    = "Allow",
             Principal = { Service = "ecs-tasks.amazonaws.com" }
+          },
+          {
+            Action    = [
+             "ssm:GetParametersByPath", 
+             "ssm:GetParameter"
+            ],
+            Effect    = "Allow",
+            Resource  = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.app_name}/${var.environment}/*"
           }
         ]
       })

@@ -25,6 +25,7 @@ generate_hcl "_auto_generated_ecs.tf" {
               awslogs-stream-prefix = "ecs"
             }
           }
+          environment = var.env_vars
         }
       ])
     }
