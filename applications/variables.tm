@@ -48,6 +48,13 @@ generate_hcl "_auto_generated_variables.tf" {
         value = string
       }))
     }
+
+    variable "ssm_parameters" {
+      description = "List of SSM parameters to inject as ECS secrets"
+      type = list(object({
+        name = string
+      }))
+    }
     
   }
 }
