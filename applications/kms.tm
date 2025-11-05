@@ -25,7 +25,6 @@ generate_hcl "_auto_generated_kms.tf" {
         Version = "2012-10-17"
         Id      = "ecr-kms-policy"
         Statement = [
-          # Allow root account full control
           {
             Sid      = "EnableRootPermissions"
             Effect   = "Allow"
@@ -35,7 +34,6 @@ generate_hcl "_auto_generated_kms.tf" {
             Action   = "kms:*"
             Resource = "*"
           },
-          # Allow ECR service to use the key for encryption
           {
             Sid      = "AllowECRServiceUsage"
             Effect   = "Allow"
@@ -50,7 +48,6 @@ generate_hcl "_auto_generated_kms.tf" {
             ]
             Resource = "*"
           },
-          # Allow ECS service to use the key for task secrets, logs, etc.
           {
             Sid      = "AllowECSServiceUsage",
             Effect   = "Allow",
@@ -60,6 +57,20 @@ generate_hcl "_auto_generated_kms.tf" {
             Action = [
               "kms:Encrypt",
               "kms:Decrypt",
+              "kms:GenerateDataKey*",
+              "kms:DescribeKey"
+            ],
+            Resource = "*"
+          },
+          {
+            Sid      = "AllowCloudWatchLogsEncryption",
+            Effect   = "Allow",
+            Principal = {
+              Service = "logs.eu-west-1.amazonaws.com"
+            },
+            Action = [
+              "kms:Encrypt*",
+              "kms:Decrypt*",
               "kms:GenerateDataKey*",
               "kms:DescribeKey"
             ],
