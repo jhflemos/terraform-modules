@@ -6,6 +6,11 @@ generate_hcl "_auto_generated_ecs_auto_scaling.tf" {
       resource_id        = "service/${var.environment}-ecs-cluster/${var.app_name}-service"
       scalable_dimension = "ecs:service:DesiredCount"
       service_namespace  = "ecs"
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-autoscaling-target"
+        Application = var.app_name
+      }
     }
 
     resource "aws_appautoscaling_policy" "cpu_scale" {
@@ -23,11 +28,6 @@ generate_hcl "_auto_generated_ecs_auto_scaling.tf" {
         scale_in_cooldown  = 120
         scale_out_cooldown = 60
       }
-
-      tags = {
-        Name        = "${var.app_name}-${var.environment}-cpu-scaling-policy"
-        Application = var.app_name
-      }
     }
 
     resource "aws_appautoscaling_policy" "memory_scale" {
@@ -44,11 +44,6 @@ generate_hcl "_auto_generated_ecs_auto_scaling.tf" {
         target_value       = 70  # scale if avg memory > 70%
         scale_in_cooldown  = 120
         scale_out_cooldown = 60
-      }
-
-      tags = {
-        Name        = "${var.app_name}-${var.environment}-memory-scaling-policy"
-        Application = var.app_name
       }
     }
   }
