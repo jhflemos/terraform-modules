@@ -10,14 +10,6 @@ generate_hcl "_auto_generated_iam.tf" {
             Action    = "sts:AssumeRole",
             Effect    = "Allow",
             Principal = { Service = "ecs-tasks.amazonaws.com" }
-          },
-          {
-            Action    = [
-             "ssm:GetParametersByPath", 
-             "ssm:GetParameter"
-            ],
-            Effect    = "Allow",
-            Resource  = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.app_name}/${var.environment}/*"
           }
         ]
       })
@@ -41,6 +33,31 @@ generate_hcl "_auto_generated_iam.tf" {
           }
         ]
       })
+    }
+
+    resource "aws_iam_policy" "ecs_ssm_policy" {
+      name        = "${var.app_name}-${var.environment}-ecs-ssm-policy"
+      description = "Allow ECS task to read parameters from SSM Parameter Store"
+
+      policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+          {
+            Effect = "Allow"
+            Action = [
+              "ssm:GetParameters",
+              "ssm:GetParameter",
+              "ssm:GetParametersByPath"
+            ]
+            Resource = "arn:aws:ssm:us-east-1:123456789012:parameter/${var.app_name}/${var.environment}*"
+          }
+        ]
+      })
+    }
+
+    resource "aws_iam_role_policy_attachment" "ecs_task_ssm_attach" {
+      role       = aws_iam_role.ecs_task.name
+      policy_arn = aws_iam_policy.ecs_ssm_policy.arn
     }
 
   }
