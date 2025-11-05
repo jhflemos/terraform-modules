@@ -21,7 +21,7 @@ generate_hcl "_auto_generated_ecs_task_defintion.tf" {
             logDriver = "awslogs"
             options = {
               awslogs-group         = aws_cloudwatch_log_group.app_logs.name
-              awslogs-region        = data.aws_region.current.name
+              awslogs-region        = data.aws_region.current.region
               awslogs-stream-prefix = "ecs"
             }
           }
