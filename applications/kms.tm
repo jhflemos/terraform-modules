@@ -33,7 +33,7 @@ generate_hcl "_auto_generated_kms.tf" {
       # Policy
       enable_default_policy = local.kms.enable_default_policy
       key_owners            = local.kms.key_owners
-      key_users             = concat(local.kms.key_users, [module.iam_role_app.iam_role_arn])
+      key_users             = local.kms.key_users
 
       grants = try(local.kms.grants, null)
 
