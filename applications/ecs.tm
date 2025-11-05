@@ -29,7 +29,7 @@ generate_hcl "_auto_generated_ecs.tf" {
           secrets = [
             for param in var.ssm_parameters : {
               name      = param.name
-              valueFrom = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/app/${var.app_name}/${var.environment}/${lower(param.name)}"
+              valueFrom = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/app/${var.app_name}/${var.environment}/${param.name}"
             }
           ]
         }
