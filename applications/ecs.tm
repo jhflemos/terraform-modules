@@ -1,4 +1,4 @@
-generate_hcl "_auto_generated_ecs_task_defintion.tf" {
+generate_hcl "_auto_generated_ecs.tf" {
   content {
     resource "aws_ecs_task_definition" "app" {
       family                   = "${var.app_name}"
@@ -28,5 +28,34 @@ generate_hcl "_auto_generated_ecs_task_defintion.tf" {
         }
       ])
     }
+
+    resource "aws_ecs_service" "app_service" {
+      name             = "${var.app_name}-service"
+      cluster          = "${var.environment}-ecs-cluster"
+      task_definition  = aws_ecs_task_definition.app.arn
+      launch_type      = "FARGATE"
+      desired_count    = 2
+      platform_version = "LATEST"
+
+      network_configuration {
+        subnets         = var.private_subnets
+        assign_public_ip = false
+        security_groups = [aws_security_group.ecs_sg.id]
+      }
+
+      load_balancer {
+        target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
+        container_name   = "app"
+        container_port   = 8080
+      }
+
+      deployment_controller {
+        type = "ECS"
+      }
+
+      deployment_minimum_healthy_percent = 50
+      deployment_maximum_percent         = 200
+    }
+
   }
 }

@@ -5,6 +5,11 @@ generate_hcl "_auto_generated_variables.tf" {
       description = "Application name"
     }
 
+    variable "vpc_id" {
+      type        = string
+      description = ""
+    }
+
      variable "tags" {
        type        = map(string)
        default     = {}
@@ -20,5 +25,22 @@ generate_hcl "_auto_generated_variables.tf" {
       type    = any
       default = {}
     } 
+
+    variable "alb_arn" {
+      type        = string
+      description = ""
+    }
+
+    variable "alb_sg_id" {
+      type        = string
+      description = ""
+    }
+
+    variable "private_subnets" {
+      type        = list(string)
+      description = "A list of private subnets"
+      default     = []
+    }
+    
   }
 }
