@@ -75,7 +75,7 @@ generate_hcl "_auto_generated_kms.tf" {
     }
 
     resource "aws_kms_alias" "app_kms_key_alias" {
-      name          = "app/${var.environment}/${var.app_name}"
+      name          = "alias/app/${var.environment}/${var.app_name}"
       target_key_id = aws_kms_key.app_kms_key.id
     }
   }
