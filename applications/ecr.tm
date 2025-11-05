@@ -9,6 +9,11 @@ generate_hcl "_auto_generated_ecr.tf" {
         scan_on_push = true
       }
 
+      encryption_configuration {
+       encryption_type = "KMS"
+       kms_key         = "app/${var.environment}/${var.app_name}"
+      }
+
       tags = {
         Name        = var.app_name
         Environment = var.environment
