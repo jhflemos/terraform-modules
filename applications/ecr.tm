@@ -16,7 +16,7 @@ generate_hcl "_auto_generated_ecr.tf" {
 
       encryption_configuration {
        encryption_type = "KMS"
-       kms_key         = module.kms.arn
+       kms_key         = aws_kms_key.app_kms_key.arn
       }
 
       tags = {

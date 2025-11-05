@@ -8,49 +8,75 @@ generate_hcl "_auto_generated_kms.tf" {
         is_enabled              = true
         key_usage               = "ENCRYPT_DECRYPT"
         multi_region            = false
-        enable_default_policy   = true
-        key_owners              = []
-        key_users               = []
-        grants                  = {}
-        aliases_use_name_prefix = false
-        aliases                 = []
       }
 
       kms = merge(local.kms_defaults, var.kms)
     }
 
-    module "kms" {
-      source  = "terraform-aws-modules/kms/aws"
-      version = "v3.1.1"
-
+    resource "aws_kms_key" "app_kms_key" {
       description             = "Application kms key for ${var.app_name} application on ${var.environment} environment"
       deletion_window_in_days = local.kms.deletion_window_in_days
       enable_key_rotation     = local.kms.enable_key_rotation
-      is_enabled              = local.kms.is_enabled
       key_usage               = local.kms.key_usage
       multi_region            = local.kms.multi_region
+      is_enabled              = local.kms.is_enabled
 
-      # Policy
-      enable_default_policy = local.kms.enable_default_policy
-      key_owners            = local.kms.key_owners
-      key_users             = local.kms.key_users
-
-      grants = try(local.kms.grants, null)
-
-      # Aliases
-      aliases_use_name_prefix = local.kms.aliases_use_name_prefix
-      aliases                 = local.kms.aliases
-
-      computed_aliases = {
-        app = {
-          name = "app/${var.environment}/${var.app_name}" # app/prod/app-name || app/test/app-name
-        }
-      }
+      policy = jsonencode({
+        Version = "2012-10-17"
+        Id      = "ecr-kms-policy"
+        Statement = [
+          # Allow root account full control
+          {
+            Sid      = "EnableRootPermissions"
+            Effect   = "Allow"
+            Principal = {
+              AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+            }
+            Action   = "kms:*"
+            Resource = "*"
+          },
+          # Allow ECR service to use the key for encryption
+          {
+            Sid      = "AllowECRServiceUsage"
+            Effect   = "Allow"
+            Principal = {
+              Service = "ecr.amazonaws.com"
+            }
+            Action = [
+              "kms:Encrypt",
+              "kms:Decrypt",
+              "kms:GenerateDataKey*",
+              "kms:DescribeKey"
+            ]
+            Resource = "*"
+          },
+          # Allow ECS service to use the key for task secrets, logs, etc.
+          {
+            Sid      = "AllowECSServiceUsage",
+            Effect   = "Allow",
+            Principal = {
+              Service = "ecs-tasks.amazonaws.com"
+            },
+            Action = [
+              "kms:Encrypt",
+              "kms:Decrypt",
+              "kms:GenerateDataKey*",
+              "kms:DescribeKey"
+            ],
+            Resource = "*"
+          }
+        ]
+      })
 
       tags = {
         Name        = var.app_name
         Environment = var.environment
       }
+    }
+
+    resource "aws_kms_alias" "app_kms_key_alias" {
+      name          = "app/${var.environment}/${var.app_name}"
+      target_key_id = aws_kms_key.app_kms_key.id
     }
   }
 }
