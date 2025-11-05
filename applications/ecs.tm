@@ -1,7 +1,7 @@
 generate_hcl "_auto_generated_ecs.tf" {
   content {
     resource "aws_ecs_task_definition" "app" {
-      family                   = "${var.app_name}"
+      family                   = "${var.app_name}-${var.environment}-task-definition"
       network_mode             = "awsvpc"
       requires_compatibilities = ["FARGATE"]
       cpu                      = "256"
@@ -34,10 +34,15 @@ generate_hcl "_auto_generated_ecs.tf" {
           ]
         }
       ])
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-task-definition"
+        Application = var.app_name
+      }
     }
 
     resource "aws_ecs_service" "app_service" {
-      name             = "${var.app_name}-service"
+      name             = "${var.app_name}-${var.environment}-service"
       cluster          = "${var.environment}-ecs-cluster"
       task_definition  = aws_ecs_task_definition.app.arn
       launch_type      = "FARGATE"
@@ -62,7 +67,11 @@ generate_hcl "_auto_generated_ecs.tf" {
 
       deployment_minimum_healthy_percent = 50
       deployment_maximum_percent         = 200
-    }
 
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-service"
+        Application = var.app_name
+      }
+    }
   }
 }

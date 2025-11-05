@@ -20,8 +20,8 @@ generate_hcl "_auto_generated_ecr.tf" {
       }
 
       tags = {
-        Name        = var.app_name
-        Environment = var.environment
+        Name        = "${var.app_name}-${var.environment}"
+        Application = var.app_name
       }
     }
 

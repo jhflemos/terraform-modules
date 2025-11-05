@@ -1,7 +1,7 @@
 generate_hcl "_auto_generated_load_balance.tf" {
   content {
     resource "aws_lb_target_group" "app_lb_service_tg" {
-      name        = "${var.app_name}-service-tg"
+      name        = "${var.app_name}-${var.environment}-service-tg"
       port        = 8080
       protocol    = "HTTP"
       vpc_id      = var.vpc_id
@@ -14,6 +14,11 @@ generate_hcl "_auto_generated_load_balance.tf" {
         healthy_threshold   = 2
         unhealthy_threshold = 2
         matcher             = "200-399"
+      }
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-service-tg"
+        Application = var.app_name
       }
     }
 
@@ -28,6 +33,11 @@ generate_hcl "_auto_generated_load_balance.tf" {
         type             = "forward"
         target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
       }
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-lb-listener-https"
+        Application = var.app_name
+      }
     }
 
     resource "aws_lb_listener" "http" {
@@ -35,9 +45,14 @@ generate_hcl "_auto_generated_load_balance.tf" {
       port              = 80
       protocol          = "HTTP"
 
-      default_action {
+      default_action { # change it to redirect to https
         type             = "forward"
         target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
+      }
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-lb-listener-http"
+        Application = var.app_name
       }
     }
 

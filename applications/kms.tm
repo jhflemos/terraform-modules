@@ -80,8 +80,8 @@ generate_hcl "_auto_generated_kms.tf" {
       })
 
       tags = {
-        Name        = var.app_name
-        Environment = var.environment
+        Name        = "alias/app/${var.environment}/${var.app_name}"
+        Application = var.app_name
       }
     }
 

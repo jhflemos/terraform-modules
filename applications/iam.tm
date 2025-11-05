@@ -1,7 +1,7 @@
 generate_hcl "_auto_generated_iam.tf" {
   content {
     resource "aws_iam_role" "ecs_task_execution" {
-      name = "ecsTaskExecutionRole"
+      name = "${var.app_name}-${var.environment}-ecsTaskExecutionRole"
 
       assume_role_policy = jsonencode({
         Version = "2012-10-17",
@@ -13,6 +13,11 @@ generate_hcl "_auto_generated_iam.tf" {
           }
         ]
       })
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-ecsTaskExecutionRole"
+        Application = var.app_name
+      }
     }
 
     resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
@@ -21,7 +26,7 @@ generate_hcl "_auto_generated_iam.tf" {
     }
 
     resource "aws_iam_role" "ecs_task" {
-      name = "ecsTaskAppRole"
+      name = "${var.app_name}-${var.environment}-ecsTaskAppRole"
 
       assume_role_policy = jsonencode({
         Version = "2012-10-17",
@@ -33,6 +38,11 @@ generate_hcl "_auto_generated_iam.tf" {
           }
         ]
       })
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-ecsTaskAppRole"
+        Application = var.app_name
+      }
     }
 
     resource "aws_iam_policy" "ecs_custom_policy" {
@@ -60,6 +70,11 @@ generate_hcl "_auto_generated_iam.tf" {
           }
         ]
       })
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-ecs-custom-policy"
+        Application = var.app_name
+      }
     }
 
     resource "aws_iam_role_policy_attachment" "ecs_task_ssm_attach" {
@@ -71,6 +86,5 @@ generate_hcl "_auto_generated_iam.tf" {
       role       = aws_iam_role.ecs_task_execution.name
       policy_arn = aws_iam_policy.ecs_custom_policy.arn
     }
-
   }
 }

@@ -1,7 +1,7 @@
 generate_hcl "_auto_generated_security_group.tf" {
   content {
     resource "aws_security_group" "ecs_sg" {
-      name        = "${var.environment}-ecs-sg"
+      name        = "${var.app_name}-${var.environment}-ecs-sg"
       description = "Allow traffic from ALB"
       vpc_id      = var.vpc_id
 
@@ -20,8 +20,8 @@ generate_hcl "_auto_generated_security_group.tf" {
       }
 
       tags = { 
-        Name        = "${var.environment}-ecs-sg" 
-        Environment = var.environment
+        Name        = "${var.app_name}-${var.environment}-ecs-sg"
+        Application = var.app_name
       }
     }
   }
