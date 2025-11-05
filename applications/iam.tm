@@ -49,7 +49,7 @@ generate_hcl "_auto_generated_iam.tf" {
               "ssm:GetParameter",
               "ssm:GetParametersByPath"
             ]
-            Resource = "arn:aws:ssm:us-east-1:123456789012:parameter/app/${var.app_name}/${var.environment}*"
+            Resource = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/app/${var.app_name}/${var.environment}*"
           }
         ]
       })
