@@ -40,21 +40,21 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "http" {
-      load_balancer_arn = var.alb_arn
-      port              = 80
-      protocol          = "HTTP"
-
-      default_action { # change it to redirect to https
-        type             = "forward"
-        target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
-      }
-
-      tags = {
-        Name        = "${var.app_name}-${var.environment}-lb-listener-http"
-        Application = var.app_name
-      }
-    }
+    #resource "aws_lb_listener" "http" {
+    #  load_balancer_arn = var.alb_arn
+    #  port              = 80
+    #  protocol          = "HTTP"
+#
+    #  default_action { # change it to redirect to https
+    #    type             = "forward"
+    #    target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
+    #  }
+#
+    #  tags = {
+    #    Name        = "${var.app_name}-${var.environment}-lb-listener-http"
+    #    Application = var.app_name
+    #  }
+    #}
 
   }
 }
