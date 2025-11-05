@@ -3,7 +3,7 @@ generate_hcl "_auto_generated_ecs_auto_scaling.tf" {
     resource "aws_appautoscaling_target" "ecs_target" {
       max_capacity       = 5
       min_capacity       = 1
-      resource_id        = "service/${var.environment}-ecs-cluster/${var.app_name}-service"
+      resource_id        = "service/${var.environment}-ecs-cluster/${var.app_name}-${var.environment}-service"
       scalable_dimension = "ecs:service:DesiredCount"
       service_namespace  = "ecs"
 
