@@ -35,9 +35,9 @@ generate_hcl "_auto_generated_iam.tf" {
       })
     }
 
-    resource "aws_iam_policy" "ecs_ssm_policy" {
-      name        = "${var.app_name}-${var.environment}-ecs-ssm-policy"
-      description = "Allow ECS task to read parameters from SSM Parameter Store"
+    resource "aws_iam_policy" "ecs_custom_policy" {
+      name        = "${var.app_name}-${var.environment}-ecs-custom-policy"
+      description = "Custom policy for ecs"
 
       policy = jsonencode({
         Version = "2012-10-17"
@@ -50,19 +50,28 @@ generate_hcl "_auto_generated_iam.tf" {
               "ssm:GetParametersByPath"
             ]
             Resource = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/app/${var.app_name}/${var.environment}*"
+          },
+          {
+            Effect = "Allow"
+            Action = [
+              "kms"
+            ]
+            Resource = aws_kms_key.app_kms_key.arn
           }
         ]
       })
     }
 
+
+
     resource "aws_iam_role_policy_attachment" "ecs_task_ssm_attach" {
       role       = aws_iam_role.ecs_task.name
-      policy_arn = aws_iam_policy.ecs_ssm_policy.arn
+      policy_arn = aws_iam_policy.ecs_custom_policy.arn
     }
 
     resource "aws_iam_role_policy_attachment" "ecs_task_execution_ssm_attach" {
       role       = aws_iam_role.ecs_task_execution.name
-      policy_arn = aws_iam_policy.ecs_ssm_policy.arn
+      policy_arn = aws_iam_policy.ecs_custom_policy.arn
     }
 
   }
