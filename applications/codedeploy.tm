@@ -23,10 +23,10 @@ generate_hcl "_auto_generated_code_deploy.tf" {
 
       load_balancer_info {
         target_group_pair_info {
-          target_groups {
+          target_group {
             name = aws_lb_target_group.app_lb_service_tg_blue.name
           }
-          target_groups {
+          target_group {
             name = aws_lb_target_group.app_lb_service_tg_green.name
           }
           prod_traffic_route {
@@ -75,10 +75,10 @@ generate_hcl "_auto_generated_code_deploy.tf" {
 
       load_balancer_info {
         target_group_pair_info {
-          target_groups {
+          target_group {
             name = aws_lb_target_group.app_lb_service_tg_blue.name
           }
-          target_groups {
+          target_group {
             name = aws_lb_target_group.app_lb_service_tg_green.name
           }
           prod_traffic_route {
