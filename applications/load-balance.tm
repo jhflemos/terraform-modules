@@ -15,8 +15,20 @@ generate_hcl "_auto_generated_load_balance.tf" {
       alb = merge(local.alb_defaults, var.alb)
     }
 
+    resource "random_string" "app_lb_service_tg_blue_name" {
+      length           = 16
+      special          = true
+      override_special = "/@!$"
+    }
+
+    resource "random_string" "app_lb_service_tg_green_name" {
+      length           = 24
+      special          = true
+      override_special = "/@!$"
+    }
+
     resource "aws_lb_target_group" "app_lb_service_tg_blue" {
-      name        = "${var.app_name}-${var.environment}-svc-tg-blue"
+      name        = random_string.app_lb_service_tg_blue_name.result
       port        = 8080
       protocol    = "HTTP"
       vpc_id      = var.vpc_id
@@ -38,7 +50,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_target_group" "app_lb_service_tg_green" {
-      name        = "${var.app_name}-${var.environment}-svc-tg-green"
+      name        = random_string.app_lb_service_tg_blue_name.result
       port        = 8080
       protocol    = "HTTP"
       vpc_id      = var.vpc_id
