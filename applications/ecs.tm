@@ -65,17 +65,13 @@ generate_hcl "_auto_generated_ecs.tf" {
         type = "CODE_DEPLOY"
       }
 
-      lifecycle {
-        ignore_changes = [
-          task_definition,
-          load_balancer,
-          desired_count,
-          platform_version,
-        ]
-      }
-
       deployment_minimum_healthy_percent = 50
       deployment_maximum_percent         = 200
+
+      depends_on = [
+        aws_lb_target_group.app_lb_service_tg_blue,
+        aws_lb_target_group.app_lb_service_tg_green
+      ]
 
       tags = {
         Name        = "${var.app_name}-${var.environment}-service"
