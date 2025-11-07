@@ -37,27 +37,6 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "http" {
-      load_balancer_arn = local.alb.alb_arn
-      port              = 80
-      protocol          = "HTTP"
-
-      default_action {
-        type = "redirect"
-
-        redirect {
-          port        = "443"
-          protocol    = "HTTPS"
-          status_code = "HTTP_301"
-        }
-      }
-
-      tags = {
-        Name        = "${var.app_name}-${var.environment}-lb-listener-http"
-        Application = var.app_name
-      }
-    }
-
     resource "aws_lb_listener_rule" "rules" {
       count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
       listener_arn = local.alb.listener_arn
