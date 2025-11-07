@@ -66,7 +66,7 @@ generate_hcl "_auto_generated_code_deploy.tf" {
       app_name               = aws_codedeploy_app.ecs_app.name
       deployment_group_name  = "${var.app_name}-${var.environment}-linear"
       service_role_arn       = aws_iam_role.codedeploy_role.arn
-      deployment_config_name = aws_codedeploy_deployment_config.linear.name
+      deployment_config_name = aws_codedeploy_deployment_config.linear.id
 
       ecs_service {
         service_name = "${var.app_name}-${var.environment}-service"
