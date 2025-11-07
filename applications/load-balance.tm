@@ -40,7 +40,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     resource "aws_lb_listener_rule" "rules" {
       count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
       listener_arn = local.alb.listener_arn
-      priority     = 100
+      priority     = local.alb.listener.priority
 
       action {
         type             = "forward"
