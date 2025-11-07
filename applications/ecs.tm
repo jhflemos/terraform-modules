@@ -56,20 +56,11 @@ generate_hcl "_auto_generated_ecs.tf" {
       }
 
       deployment_controller {
-        type = "CODE_DEPLOY"
+        type = "ECS"
       }
 
       deployment_minimum_healthy_percent = 50
       deployment_maximum_percent         = 200
-
-      lifecycle {
-        ignore_changes = [
-          task_definition,
-          load_balancer,
-          platform_version,
-          desired_count,
-        ]
-      }
 
       tags = {
         Name        = "${var.app_name}-${var.environment}-service"
