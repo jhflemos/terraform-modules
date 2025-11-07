@@ -75,6 +75,7 @@ generate_hcl "_auto_generated_ecs.tf" {
 
       lifecycle {
         ignore_changes = [
+          platform_version,
           load_balancer,
           task_definition,
           desired_count,
