@@ -41,7 +41,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "http" {
-      load_balancer_arn = var.alb_arn
+      load_balancer_arn = var.alb.alb_arn
       port              = 80
       protocol          = "HTTP"
 
@@ -68,7 +68,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
       action {
         type             = "forward"
-        target_group_arn = aws_lb_target_group.orders_api_tg.arn
+        target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
       }
 
       dynamic "condition" {
@@ -90,9 +90,6 @@ generate_hcl "_auto_generated_load_balance.tf" {
         }
       }
     }
-
-
-    
 
   }
 }
