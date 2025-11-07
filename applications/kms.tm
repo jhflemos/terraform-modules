@@ -83,11 +83,19 @@ generate_hcl "_auto_generated_kms.tf" {
         Name        = "alias/app/${var.environment}/${var.app_name}"
         Application = var.app_name
       }
+
+      lifecycle {
+        prevent_destroy = true
+      }
     }
 
     resource "aws_kms_alias" "app_kms_key_alias" {
       name          = "alias/app/${var.environment}/${var.app_name}"
       target_key_id = aws_kms_key.app_kms_key.id
+
+      lifecycle {
+        prevent_destroy = true
+      }
     }
   }
 }
