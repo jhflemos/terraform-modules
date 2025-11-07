@@ -33,20 +33,6 @@ generate_hcl "_auto_generated_load_balance.tf" {
         type             = "forward"
         target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
       }
-
-      dynamic "condition" {
-        for_each = lookup(var.alb.listener, "condition", [])
-
-        content {
-          dynamic "path_pattern" {
-            for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
-
-            content {
-              values = path_pattern.value.values
-            }
-          }
-        }
-      }
       
       tags = {
         Name        = "${var.app_name}-${var.environment}-lb-listener-https"
@@ -54,21 +40,59 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    #resource "aws_lb_listener" "http" {
-    #  load_balancer_arn = var.alb_arn
-    #  port              = 80
-    #  protocol          = "HTTP"
-#
-    #  default_action { # change it to redirect to https
-    #    type             = "forward"
-    #    target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
-    #  }
-#
-    #  tags = {
-    #    Name        = "${var.app_name}-${var.environment}-lb-listener-http"
-    #    Application = var.app_name
-    #  }
-    #}
+    resource "aws_lb_listener" "http" {
+      load_balancer_arn = var.alb_arn
+      port              = 80
+      protocol          = "HTTP"
+
+      default_action {
+        type = "redirect"
+
+        redirect {
+          port        = "443"
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
+        }
+      }
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-lb-listener-http"
+        Application = var.app_name
+      }
+    }
+
+    resource "aws_lb_listener_rule" "rules" {
+      count        = try(length(var.alb.listener.condition), 0) > 0 ? 1 : 0
+      listener_arn = aws_lb_listener.https.arn
+      priority     = 50
+
+      action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.orders_api_tg.arn
+      }
+
+      dynamic "condition" {
+        for_each = lookup(var.alb.listener, "condition", [])
+        content {
+          dynamic "path_pattern" {
+            for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
+            content {
+              values = path_pattern.value.values
+            }
+          }
+
+          dynamic "host_header" {
+            for_each = lookup(condition.value, "host_header", null) == null ? [] : [condition.value.host_header]
+            content {
+              values = host_header.value.values
+            }
+          }
+        }
+      }
+    }
+
+
+    
 
   }
 }
