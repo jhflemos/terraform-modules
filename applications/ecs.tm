@@ -46,7 +46,7 @@ generate_hcl "_auto_generated_ecs.tf" {
       cluster          = "${var.environment}-ecs-cluster"
       task_definition  = aws_ecs_task_definition.app.arn
       launch_type      = "FARGATE"
-      desired_count    = 2
+      desired_count    = 3
       platform_version = "LATEST"
 
       network_configuration {
