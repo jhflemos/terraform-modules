@@ -65,6 +65,15 @@ generate_hcl "_auto_generated_ecs.tf" {
         type = "CODE_DEPLOY"
       }
 
+      lifecycle {
+        ignore_changes = [
+          task_definition,
+          load_balancer,
+          desired_count,
+          platform_version,
+        ]
+      }
+
       deployment_minimum_healthy_percent = 50
       deployment_maximum_percent         = 200
 
