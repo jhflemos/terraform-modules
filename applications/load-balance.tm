@@ -1,5 +1,20 @@
 generate_hcl "_auto_generated_load_balance.tf" {
   content {
+    locals {
+      alb_defaults = {
+        health_check = {
+          path                = "/"
+          interval            = 30
+          timeout             = 5
+          healthy_threshold   = 2
+          unhealthy_threshold = 2
+          matcher             = "200-399"
+        }
+      }
+
+      alb = merge(local.alb_defaults, var.alb)
+    }
+
     resource "aws_lb_target_group" "app_lb_service_tg" {
       name        = "${var.app_name}-${var.environment}-service-tg"
       port        = 8080
