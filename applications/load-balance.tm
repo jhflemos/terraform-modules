@@ -23,12 +23,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       target_type = "ip"
 
       health_check {
-        path                = var.alb.health_check.path
-        interval            = var.alb.health_check.interval
-        timeout             = var.alb.health_check.timeout
-        healthy_threshold   = var.alb.health_check.healthy_threshold
-        unhealthy_threshold = var.alb.health_check.unhealthy_threshold
-        matcher             = var.alb.health_check.matcher
+        path                = local.alb.health_check.path
+        interval            = local.alb.health_check.interval
+        timeout             = local.alb.health_check.timeout
+        healthy_threshold   = local.alb.health_check.healthy_threshold
+        unhealthy_threshold = local.alb.health_check.unhealthy_threshold
+        matcher             = local.alb.health_check.matcher
       }
 
       tags = {
@@ -38,11 +38,11 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "https" {
-      load_balancer_arn = var.alb.alb_arn
+      load_balancer_arn = local.alb.alb_arn
       port              = "443"
       protocol          = "HTTPS"
       ssl_policy        = "ELBSecurityPolicy-2016-08"
-      certificate_arn   = var.alb.aws_acm_certificate_arn
+      certificate_arn   = local.alb.aws_acm_certificate_arn
 
       default_action {
         type             = "forward"
@@ -56,7 +56,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "http" {
-      load_balancer_arn = var.alb.alb_arn
+      load_balancer_arn = local.alb.alb_arn
       port              = 80
       protocol          = "HTTP"
 
@@ -77,7 +77,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener_rule" "rules" {
-      count        = try(length(var.alb.listener.condition), 0) > 0 ? 1 : 0
+      count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
       listener_arn = aws_lb_listener.https.arn
       priority     = 50
 
@@ -87,7 +87,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
 
       dynamic "condition" {
-        for_each = lookup(var.alb.listener, "condition", [])
+        for_each = lookup(local.alb.listener, "condition", [])
         content {
           dynamic "path_pattern" {
             for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
