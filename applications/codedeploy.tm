@@ -14,7 +14,7 @@ generate_hcl "_auto_generated_code_deploy.tf" {
       app_name               = aws_codedeploy_app.ecs_app.name
       deployment_group_name  = "${var.app_name}-${var.environment}-canary"
       service_role_arn       = aws_iam_role.codedeploy_role.arn
-      deployment_config_name = aws_codedeploy_deployment_config.canary.id
+      deployment_config_name = "CodeDeployDefault.ECSCanary10Percent5Minutes"
 
       ecs_service {
         service_name = aws_ecs_service.app_service.name
@@ -54,21 +54,6 @@ generate_hcl "_auto_generated_code_deploy.tf" {
       deployment_style {
         deployment_type   = "BLUE_GREEN"
         deployment_option = "WITH_TRAFFIC_CONTROL"
-      }
-    }
-
-    # Canary Deployment Config
-    resource "aws_codedeploy_deployment_config" "canary" {
-      compute_platform       = "ECS"
-      deployment_config_name = "${var.app_name}-${var.environment}.Canary10Percent5Minutes"
-
-      traffic_routing_config {
-        type = "TimeBasedCanary"
-
-        time_based_canary {
-          percentage = 10   # Percentage of traffic to shift to new version initially
-          interval   = 5    # Minutes to wait before shifting remaining traffic
-        }
       }
     }
   }
