@@ -37,24 +37,6 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "https" {
-      load_balancer_arn = local.alb.alb_arn
-      port              = "443"
-      protocol          = "HTTPS"
-      ssl_policy        = "ELBSecurityPolicy-2016-08"
-      certificate_arn   = local.alb.aws_acm_certificate_arn
-
-      default_action {
-        type             = "forward"
-        target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
-      }
-      
-      tags = {
-        Name        = "${var.app_name}-${var.environment}-lb-listener-https"
-        Application = var.app_name
-      }
-    }
-
     resource "aws_lb_listener" "http" {
       load_balancer_arn = local.alb.alb_arn
       port              = 80
@@ -78,8 +60,8 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
     resource "aws_lb_listener_rule" "rules" {
       count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
-      listener_arn = aws_lb_listener.https.arn
-      priority     = 50
+      listener_arn = local.alb.listener_arn
+      priority     = 100
 
       action {
         type             = "forward"
