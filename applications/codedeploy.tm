@@ -56,8 +56,8 @@ generate_hcl "_auto_generated_code_deploy.tf" {
         type = "TimeBasedCanary"
 
         time_based_canary {
-          canary_percentage = 10   # Percentage of traffic to shift to new version initially
-          interval          = 5    # Minutes to wait before shifting remaining traffic
+          percentage = 10   # Percentage of traffic to shift to new version initially
+          interval   = 5    # Minutes to wait before shifting remaining traffic
         }
       }
     }
@@ -108,8 +108,8 @@ generate_hcl "_auto_generated_code_deploy.tf" {
         type = "TimeBasedLinear"
 
         time_based_linear {
-          linear_percentage = 10   # Percentage of traffic to shift at each interval
-          interval          = 1    # Minutes between each shift
+          percentage = 10   # Percentage of traffic to shift at each interval
+          interval   = 1    # Minutes between each shift
         }
       }
     }
