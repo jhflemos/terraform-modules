@@ -72,6 +72,8 @@ generate_hcl "_auto_generated_ecs.tf" {
         Name        = "${var.app_name}-${var.environment}-service"
         Application = var.app_name
       }
+
+      depends_on = [aws_lb_target_group.app_lb_service_tg]
     }
   }
 }
