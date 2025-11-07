@@ -73,6 +73,14 @@ generate_hcl "_auto_generated_ecs.tf" {
         aws_lb_target_group.app_lb_service_tg_green
       ]
 
+      lifecycle {
+        ignore_changes = [
+          load_balancer,
+          task_definition,
+          desired_count,
+        ]
+      }
+
       tags = {
         Name        = "${var.app_name}-${var.environment}-service"
         Application = var.app_name
