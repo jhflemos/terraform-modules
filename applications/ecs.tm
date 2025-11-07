@@ -56,7 +56,7 @@ generate_hcl "_auto_generated_ecs.tf" {
       }
 
       deployment_controller {
-        type = "ECS"
+        type = "CODE_DEPLOY"
       }
 
       deployment_minimum_healthy_percent = 50
