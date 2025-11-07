@@ -56,7 +56,7 @@ generate_hcl "_auto_generated_ecs.tf" {
       }
 
       load_balancer {
-        target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
+        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
         container_name   = "app"
         container_port   = 8080
       }
