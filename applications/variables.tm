@@ -26,19 +26,9 @@ generate_hcl "_auto_generated_variables.tf" {
       default = {}
     } 
 
-    variable "alb_arn" {
-      type        = string
-      description = ""
-    }
-
-    variable "alb_sg_id" {
-      type        = string
-      description = ""
-    }
-
-    variable "aws_acm_certificate_arn" {
-      type        = string
-      description = ""
+    variable "alb" {
+      type    = any
+      default = {}
     }
 
     variable "private_subnets" {

@@ -8,12 +8,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       target_type = "ip"
 
       health_check {
-        path                = "/"
-        interval            = 30
-        timeout             = 5
-        healthy_threshold   = 2
-        unhealthy_threshold = 2
-        matcher             = "200-399"
+        path                = var.health_check.path
+        interval            = var.health_check.interval
+        timeout             = var.health_check.timeout
+        healthy_threshold   = var.health_check.healthy_threshold
+        unhealthy_threshold = var.health_check.unhealthy_threshold
+        matcher             = var.health_check.matcher
       }
 
       tags = {
@@ -23,17 +23,31 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "https" {
-      load_balancer_arn = var.alb_arn
+      load_balancer_arn = var.alb.alb_arn
       port              = "443"
       protocol          = "HTTPS"
       ssl_policy        = "ELBSecurityPolicy-2016-08"
-      certificate_arn   = var.aws_acm_certificate_arn
+      certificate_arn   = var.alb.aws_acm_certificate_arn
 
       default_action {
         type             = "forward"
         target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
       }
 
+      dynamic "condition" {
+        for_each = lookup(var.alb.listener, "condition", [])
+
+        content {
+          dynamic "path_pattern" {
+            for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
+
+            content {
+              values = path_pattern.value.values
+            }
+          }
+        }
+      }
+      
       tags = {
         Name        = "${var.app_name}-${var.environment}-lb-listener-https"
         Application = var.app_name
