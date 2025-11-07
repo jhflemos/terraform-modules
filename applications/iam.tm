@@ -96,34 +96,6 @@ generate_hcl "_auto_generated_iam.tf" {
             Effect = "Allow",
             Principal = { Service = "codedeploy.amazonaws.com" }
             Action = "sts:AssumeRole"
-          },
-          {
-            Effect = "Allow",
-            Resources = [
-             "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/${var.environment}-ecs-cluster/${var.app_name}-${var.environment}-service",
-             "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-ecs-cluster",
-             "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/*"
-            ]
-            Action = [
-             "ecs:DescribeServices",
-             "ecs:UpdateService",
-             "ecs:DescribeTaskDefinition",
-             "ecs:CreateTaskSet",
-             "ecs:UpdateServicePrimaryTaskSet",
-             "ecs:DeleteTaskSet",
-             "ecs:DescribeTaskSets"
-            ]
-          },
-          {
-            Effect = "Allow",
-            Resources = ["*"]
-            Action = [
-             "elasticloadbalancing:DescribeTargetGroups",
-             "elasticloadbalancing:DescribeListeners",
-             "elasticloadbalancing:ModifyListener",
-             "elasticloadbalancing:RegisterTargets",
-             "elasticloadbalancing:DeregisterTargets"
-            ]
           }
         ]
       })
@@ -132,6 +104,45 @@ generate_hcl "_auto_generated_iam.tf" {
         Name        = "${var.app_name}-${var.environment}-code-deploy-ecs-role"
         Application = var.app_name
       }
+    }
+
+    resource "aws_iam_role_policy" "codedeploy_ecs_permissions" {
+      name = "${var.app_name}-${var.environment}-codedeploy-ecs-policy"
+      role = aws_iam_role.codedeploy_role.id
+
+      policy = jsonencode({
+        Version = "2012-10-17",
+        Statement = [
+          {
+            Effect = "Allow",
+            Action = [
+              "ecs:DescribeServices",
+              "ecs:UpdateService",
+              "ecs:DescribeTaskDefinition",
+              "ecs:CreateTaskSet",
+              "ecs:UpdateServicePrimaryTaskSet",
+              "ecs:DeleteTaskSet",
+              "ecs:DescribeTaskSets"
+            ],
+            Resource = [
+              "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/${var.environment}-ecs-cluster/${var.app_name}-${var.environment}-service",
+              "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-ecs-cluster",
+              "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/*"
+            ]
+          },
+          {
+            Effect = "Allow",
+            Action = [
+              "elasticloadbalancing:DescribeTargetGroups",
+              "elasticloadbalancing:DescribeListeners",
+              "elasticloadbalancing:ModifyListener",
+              "elasticloadbalancing:RegisterTargets",
+              "elasticloadbalancing:DeregisterTargets"
+            ],
+            Resource = "*"
+          }
+        ]
+      })
     }
 
     resource "aws_iam_role_policy_attachment" "codedeploy_attach" {

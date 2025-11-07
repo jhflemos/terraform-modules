@@ -62,6 +62,13 @@ generate_hcl "_auto_generated_ecs.tf" {
       deployment_minimum_healthy_percent = 50
       deployment_maximum_percent         = 200
 
+      lifecycle {
+        ignore_changes = [
+          task_definition,
+          load_balancer,
+        ]
+      }
+
       tags = {
         Name        = "${var.app_name}-${var.environment}-service"
         Application = var.app_name
