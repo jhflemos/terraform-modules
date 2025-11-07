@@ -97,6 +97,16 @@ generate_hcl "_auto_generated_code_deploy.tf" {
         }
       }
 
+      blue_green_deployment_config {
+        deployment_ready_option {
+          action_on_timeout = "CONTINUE_DEPLOYMENT"
+        }
+
+        terminate_blue_instances_on_deployment_success {
+          action                           = "TERMINATE"
+          termination_wait_time_in_minutes = 5
+        }
+      }
 
       auto_rollback_configuration {
         enabled = true

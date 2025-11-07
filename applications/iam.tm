@@ -125,9 +125,9 @@ generate_hcl "_auto_generated_iam.tf" {
               "ecs:DescribeTaskSets"
             ],
             Resource = [
-              "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/${var.environment}-ecs-cluster/${var.app_name}-${var.environment}-service",
-              "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-ecs-cluster",
-              "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/*"
+              "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:service/${var.environment}-ecs-cluster/${var.app_name}-${var.environment}-service",
+              "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-ecs-cluster",
+              "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/*"
             ]
           },
           {
@@ -147,7 +147,7 @@ generate_hcl "_auto_generated_iam.tf" {
 
     resource "aws_iam_role_policy_attachment" "codedeploy_attach" {
       role       = aws_iam_role.codedeploy_role.name
-      policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForECS"
+      policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
     }
 
   }
