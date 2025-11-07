@@ -17,7 +17,7 @@ generate_hcl "_auto_generated_code_deploy.tf" {
       deployment_config_name = aws_codedeploy_deployment_config.canary.id
 
       ecs_service {
-        service_name = "${var.app_name}-${var.environment}-service"
+        service_name = aws_ecs_service.app_service.name
         cluster_name = "${var.environment}-ecs-cluster"
       }
 
