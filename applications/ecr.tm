@@ -23,6 +23,8 @@ generate_hcl "_auto_generated_ecr.tf" {
         Name        = "${var.app_name}-${var.environment}"
         Application = var.app_name
       }
+
+      force_delete = true
     }
 
     resource "aws_ecr_lifecycle_policy" "app_ecr_repo_lifecycle" {
