@@ -55,12 +55,6 @@ generate_hcl "_auto_generated_ecs.tf" {
         security_groups = [aws_security_group.ecs_sg.id]
       }
 
-      load_balancer {
-        target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
-        container_name   = "app"
-        container_port   = 8080
-      }
-
       deployment_controller {
         type = "CODE_DEPLOY"
       }

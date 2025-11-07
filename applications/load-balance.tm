@@ -15,8 +15,8 @@ generate_hcl "_auto_generated_load_balance.tf" {
       alb = merge(local.alb_defaults, var.alb)
     }
 
-    resource "aws_lb_target_group" "app_lb_service_tg" {
-      name        = "${var.app_name}-${var.environment}-service-tg"
+    resource "aws_lb_target_group" "app_lb_service_tg_blue" {
+      name        = "${var.app_name}-${var.environment}-service-tg-blue"
       port        = 8080
       protocol    = "HTTP"
       vpc_id      = var.vpc_id
@@ -32,7 +32,29 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
 
       tags = {
-        Name        = "${var.app_name}-${var.environment}-service-tg"
+        Name        = "${var.app_name}-${var.environment}-service-tg-blue"
+        Application = var.app_name
+      }
+    }
+
+    resource "aws_lb_target_group" "app_lb_service_tg_green" {
+      name        = "${var.app_name}-${var.environment}-service-tg-green"
+      port        = 8080
+      protocol    = "HTTP"
+      vpc_id      = var.vpc_id
+      target_type = "ip"
+
+      health_check {
+        path                = local.alb.health_check.path
+        interval            = local.alb.health_check.interval
+        timeout             = local.alb.health_check.timeout
+        healthy_threshold   = local.alb.health_check.healthy_threshold
+        unhealthy_threshold = local.alb.health_check.unhealthy_threshold
+        matcher             = local.alb.health_check.matcher
+      }
+
+      tags = {
+        Name        = "${var.app_name}-${var.environment}-service-tg-green"
         Application = var.app_name
       }
     }
@@ -44,7 +66,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
       action {
         type             = "forward"
-        target_group_arn = aws_lb_target_group.app_lb_service_tg.arn
+        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
       }
 
       dynamic "condition" {
