@@ -12,7 +12,7 @@ generate_hcl "_auto_generated_api_gateway.tf" {
 
       api_id                 = aws_apigatewayv2_api.api_gateway[0].id
       integration_type       = "HTTP"
-      integration_uri        = "https://${var.alb.alb_dns_name}/api"
+      integration_uri        = "https://${var.alb.alb_dns_name}"
       integration_method     = "ANY"
       payload_format_version = "1.0"
     }
