@@ -21,6 +21,12 @@ generate_hcl "_auto_generated_variables.tf" {
       description = "Environment which the module is being currently run in i.e. dev or prod"
     }
 
+    variable "api_gateway" {
+      type        = bool
+      description = ""
+      default     = false
+    }
+
     variable "kms" {
       type = object({
         deletion_window_in_days = number

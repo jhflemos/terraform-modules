@@ -1,5 +1,9 @@
 generate_hcl "_auto_generated_api_gateway.tf" {
 
+  condition = tm_anytrue([
+    tm_try(var.api_gateway, false), # only render if `api_gateway` is `true`
+  ])
+
   content {
     resource "aws_apigatewayv2_api" "api_gateway" {
       name          = "${var.app_name}-${var.environment}-api-gateway"
@@ -7,9 +11,10 @@ generate_hcl "_auto_generated_api_gateway.tf" {
     }
 
     resource "aws_apigatewayv2_integration" "alb_integration" {
-      api_id           = aws_apigatewayv2_api.api_gateway.id
-      integration_type = "HTTP_PROXY"
-      integration_uri  = "https://${var.alb.alb_dns_name}/api"
+      api_id                 = aws_apigatewayv2_api.api_gateway.id
+      integration_type       = "HTTP_PROXY"
+      integration_uri        = "https://${var.alb.alb_dns_name}/api"
+      integration_method     = "ANY"
       payload_format_version = "1.0"
     }
 
