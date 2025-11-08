@@ -29,7 +29,13 @@ generate_hcl "_auto_generated_variables.tf" {
         key_usage               = string
         multi_region            = bool
       })
-      default = {}
+      default = {
+       deletion_window_in_days = 7
+       enable_key_rotation     = true
+       is_enabled              = true
+       key_usage               = "ENCRYPT_DECRYPT"
+       multi_region            = false
+     }
 
       description = "KMS key used to encrypt and decrypt data"
     }

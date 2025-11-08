@@ -1,25 +1,13 @@
 generate_hcl "_auto_generated_kms.tf" {
 
   content {
-    locals {
-      kms_defaults = {
-        deletion_window_in_days = 7
-        enable_key_rotation     = true
-        is_enabled              = true
-        key_usage               = "ENCRYPT_DECRYPT"
-        multi_region            = false
-      }
-
-      kms = merge(local.kms_defaults, var.kms)
-    }
-
     resource "aws_kms_key" "app_kms_key" {
       description             = "Application kms key for ${var.app_name} application on ${var.environment} environment"
-      deletion_window_in_days = local.kms.deletion_window_in_days
-      enable_key_rotation     = local.kms.enable_key_rotation
-      key_usage               = local.kms.key_usage
-      multi_region            = local.kms.multi_region
-      is_enabled              = local.kms.is_enabled
+      deletion_window_in_days = var.kms.deletion_window_in_days
+      enable_key_rotation     = var.kms.enable_key_rotation
+      key_usage               = var.kms.key_usage
+      multi_region            = var.kms.multi_region
+      is_enabled              = var.kms.is_enabled
 
       policy = jsonencode({
         Version = "2012-10-17"
