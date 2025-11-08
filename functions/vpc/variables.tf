@@ -9,11 +9,11 @@ variable "name" {
   description = "Name prefix for all VPC resources."
 }
 
- variable "tags" {
-   type        = map(string)
-   description = "A map of tags to add to all resources."
-   default     = {}
- }
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags to add to all resources."
+  default     = {}
+}
 
 variable "environment" {
   type        = string
@@ -23,15 +23,15 @@ variable "environment" {
 variable "public_subnets" {
   description = "List of public subnets (CIDR and Availability Zone)."
   type = list(object({
-    cidr_block         = string
-    availability_zone  = string
+    cidr_block        = string
+    availability_zone = string
   }))
 }
 
 variable "private_subnets" {
   description = "List of private subnets (CIDR and Availability Zone)."
   type = list(object({
-    cidr_block         = string
-    availability_zone  = string
+    cidr_block        = string
+    availability_zone = string
   }))
 }
