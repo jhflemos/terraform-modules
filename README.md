@@ -14,7 +14,7 @@ This repository leverages **Terramate** to manage modules, environments, and mul
 
 ## 📦 Module Overview
 
-Each module lives under `modules/` (or similar), and follows this structure:
+Each module lives under `application/` or `functions/`, and follows this structure:
 
 ```
 terraform-modules/
