@@ -29,6 +29,7 @@ generate_hcl "_auto_generated_variables.tf" {
         key_usage               = string
         multi_region            = bool
       })
+      default = {}
 
       description = "KMS key used to encrypt and decrypt data"
     }
