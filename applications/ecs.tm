@@ -99,6 +99,10 @@ generate_hcl "_auto_generated_ecs.tf" {
         Name        = "${var.app_name}-${var.environment}-autoscaling-target"
         Application = var.app_name
       }
+
+      depends_on = [
+        aws_ecs_service.app_service
+      ]
     }
 
     resource "aws_appautoscaling_policy" "cpu_scale" {
