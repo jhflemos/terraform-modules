@@ -70,7 +70,8 @@ generate_hcl "_auto_generated_ecs.tf" {
 
       depends_on = [
         aws_lb_target_group.app_lb_service_tg_blue,
-        aws_lb_target_group.app_lb_service_tg_green
+        aws_lb_target_group.app_lb_service_tg_green,
+        aws_ssm_parameter.ssm_parameter
       ]
 
       lifecycle {
@@ -99,6 +100,10 @@ generate_hcl "_auto_generated_ecs.tf" {
         Name        = "${var.app_name}-${var.environment}-autoscaling-target"
         Application = var.app_name
       }
+
+      depends_on = [
+        aws_ecs_service.app_service
+      ]
     }
 
     resource "aws_appautoscaling_policy" "cpu_scale" {
