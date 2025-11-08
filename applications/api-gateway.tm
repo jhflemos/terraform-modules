@@ -1,6 +1,4 @@
 generate_hcl "_auto_generated_api_gateway.tf" {
-  condition = tm_try(var.api_gateway, false)
-
   content {
     resource "aws_apigatewayv2_api" "api_gateway" {
       count = var.api_gateway ? 1 : 0
@@ -29,7 +27,7 @@ generate_hcl "_auto_generated_api_gateway.tf" {
 
     resource "aws_apigatewayv2_stage" "api_stage" {
       count = var.api_gateway ? 1 : 0
-      
+
       api_id      = aws_apigatewayv2_api.api_gateway[0].id
       name        = "$default"
       auto_deploy = true
