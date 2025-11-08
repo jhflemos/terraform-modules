@@ -69,8 +69,6 @@ generate_hcl "_auto_generated_variables.tf" {
         })
       })
 
-      default = {}
-
       description = "ALB configuration with listener and health check settings"
     }
 
