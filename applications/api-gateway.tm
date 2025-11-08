@@ -10,7 +10,7 @@ generate_hcl "_auto_generated_api_gateway.tf" {
     resource "aws_apigatewayv2_integration" "alb_integration" {
       count = var.api_gateway ? 1 : 0
 
-      api_id                 = aws_apigatewayv2_api.api_gateway.id
+      api_id                 = aws_apigatewayv2_api.api_gateway[0].id
       integration_type       = "HTTP_PROXY"
       integration_uri        = "https://${var.alb.alb_dns_name}/api"
       integration_method     = "ANY"
@@ -20,15 +20,15 @@ generate_hcl "_auto_generated_api_gateway.tf" {
     resource "aws_apigatewayv2_route" "api_route" {
       count = var.api_gateway ? 1 : 0
 
-      api_id    = aws_apigatewayv2_api.api_gateway.id
+      api_id    = aws_apigatewayv2_api.api_gateway[0].id
       route_key = "ANY /api/{proxy+}"
-      target    = "integrations/${aws_apigatewayv2_integration.alb_integration.id}"
+      target    = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
     }
 
     resource "aws_apigatewayv2_stage" "api_stage" {
       count = var.api_gateway ? 1 : 0
-      
-      api_id      = aws_apigatewayv2_api.api_gateway.id
+
+      api_id      = aws_apigatewayv2_api.api_gateway[0].id
       name        = "$default"
       auto_deploy = true
     }
