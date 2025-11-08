@@ -35,6 +35,6 @@ jobs:
 
       - name: 'gh::release'
         if: ${{ steps.release-label.outputs.level != null }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.bump-semver.outputs.new_version }}
