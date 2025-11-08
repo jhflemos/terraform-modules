@@ -38,3 +38,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.bump-semver.outputs.new_version }}
+          token: ${{ secrets.GH_TOKEN }}
+
