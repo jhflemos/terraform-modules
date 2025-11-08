@@ -11,7 +11,7 @@ generate_hcl "_auto_generated_api_gateway.tf" {
       count = var.api_gateway ? 1 : 0
 
       api_id                 = aws_apigatewayv2_api.api_gateway[0].id
-      integration_type       = "HTTP_PROXY"
+      integration_type       = "HTTP"
       integration_uri        = "https://${var.alb.alb_dns_name}/api"
       integration_method     = "ANY"
       payload_format_version = "1.0"
