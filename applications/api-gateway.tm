@@ -9,7 +9,7 @@ generate_hcl "_auto_generated_api_gateway.tf" {
     resource "aws_apigatewayv2_integration" "alb_integration" {
       api_id           = aws_apigatewayv2_api.api_gateway.id
       integration_type = "HTTP_PROXY"
-      integration_uri  = var.alb.listener_arn
+      integration_uri  = "https://${var.alb.alb_dns_name}/api"
       payload_format_version = "1.0"
     }
 
