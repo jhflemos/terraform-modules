@@ -70,8 +70,8 @@ generate_hcl "_auto_generated_variables.tf" {
         value = string
       }))
 
-      definition = "List of environment variables to inject into the container."
-      default    = []
+      description = "List of environment variables to inject into the container."
+      default     = []
     }
 
     variable "ssm_parameters" {
