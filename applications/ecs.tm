@@ -70,7 +70,8 @@ generate_hcl "_auto_generated_ecs.tf" {
 
       depends_on = [
         aws_lb_target_group.app_lb_service_tg_blue,
-        aws_lb_target_group.app_lb_service_tg_green
+        aws_lb_target_group.app_lb_service_tg_green,
+        aws_ssm_parameter.ssm_parameter
       ]
 
       lifecycle {
