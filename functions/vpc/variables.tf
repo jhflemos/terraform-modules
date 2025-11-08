@@ -1,18 +1,18 @@
 variable "aws_region" {
   type        = string
-  description = "AWS region"
+  description = "AWS region where resources will be created."
   default     = "eu-west-1"
 }
 
 variable "name" {
   type        = string
-  description = "VPC name"
+  description = "Name prefix for all VPC resources."
 }
 
  variable "tags" {
    type        = map(string)
-   default     = {}
    description = "A map of tags to add to all resources."
+   default     = {}
  }
 
 variable "environment" {
@@ -21,7 +21,7 @@ variable "environment" {
 }
 
 variable "public_subnets" {
-  description = "List of public subnets with CIDR block and AZ"
+  description = "List of public subnets (CIDR and Availability Zone)."
   type = list(object({
     cidr_block         = string
     availability_zone  = string
@@ -29,7 +29,7 @@ variable "public_subnets" {
 }
 
 variable "private_subnets" {
-  description = "List of private subnets with CIDR block and AZ"
+  description = "List of private subnets (CIDR and Availability Zone)."
   type = list(object({
     cidr_block         = string
     availability_zone  = string

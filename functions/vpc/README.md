@@ -31,11 +31,11 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region | `string` | `"eu-west-1"` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region where resources will be created. | `string` | `"eu-west-1"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment which the module is being currently run in i.e. dev or prod | `string` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | VPC name | `string` | n/a | yes |
-| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | List of private subnets with CIDR block and AZ | <pre>list(object({<br/>    cidr_block         = string<br/>    availability_zone  = string<br/>  }))</pre> | n/a | yes |
-| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | List of public subnets with CIDR block and AZ | <pre>list(object({<br/>    cidr_block         = string<br/>    availability_zone  = string<br/>  }))</pre> | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Name prefix for all VPC resources. | `string` | n/a | yes |
+| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | List of private subnets (CIDR and Availability Zone). | <pre>list(object({<br/>    cidr_block         = string<br/>    availability_zone  = string<br/>  }))</pre> | n/a | yes |
+| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | List of public subnets (CIDR and Availability Zone). | <pre>list(object({<br/>    cidr_block         = string<br/>    availability_zone  = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources. | `map(string)` | `{}` | no |
 
 ## Outputs

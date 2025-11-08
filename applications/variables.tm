@@ -7,13 +7,13 @@ generate_hcl "_auto_generated_variables.tf" {
 
     variable "vpc_id" {
       type        = string
-      description = ""
+      description = "VPC id used to create the application resources"
     }
 
      variable "tags" {
        type        = map(string)
-       default     = {}
        description = "A map of tags to add to all resources."
+       default     = {}
      }
 
     variable "environment" {
@@ -22,18 +22,45 @@ generate_hcl "_auto_generated_variables.tf" {
     }
 
     variable "kms" {
-      type    = any
-      default = {}
-    } 
+      type = object({
+        deletion_window_in_days = number
+        enable_key_rotation     = bool
+        is_enabled              = bool
+        key_usage               = string
+        multi_region            = bool
+      })
+
+      description = "KMS key used to encrypt and decrypt data"
+    }
 
     variable "alb" {
-      type    = any
-      default = {}
+      type = object({
+        listener_arn = string
+        alb_sg_id    = string
+        health_check = object({
+          path                = string
+          interval            = number
+          timeout             = number
+          healthy_threshold   = number
+          unhealthy_threshold = number
+          matcher             = string
+        })
+        listener = object({
+          priority  = number
+          condition = list(object({
+            path_pattern = object({
+              values = list(string)
+            })
+          }))
+        })
+      })
+
+      description = "ALB configuration with listener and health check settings"
     }
 
     variable "private_subnets" {
       type        = list(string)
-      description = "A list of private subnets"
+      description = "A list of VPC private subnets"
       default     = []
     }
 
@@ -42,13 +69,18 @@ generate_hcl "_auto_generated_variables.tf" {
         name  = string
         value = string
       }))
+
+      definition = "List of environment variables to inject into the container."
+      default    = []
     }
 
     variable "ssm_parameters" {
-      description = "List of SSM parameters to inject as ECS secrets"
       type = list(object({
         name = string
       }))
+
+      description = "List of SSM parameters to inject as ECS secrets"
+      default     = []
     }
   }
 }
