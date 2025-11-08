@@ -1,5 +1,4 @@
 generate_hcl "_auto_generated_api_gateway.tf" {
-
   condition = tm_anytrue([
     tm_try(var.api_gateway, false), # only render if `api_gateway` is `true`
   ])
