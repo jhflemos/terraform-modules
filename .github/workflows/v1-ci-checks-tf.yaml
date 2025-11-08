@@ -1,0 +1,93 @@
+name: v1-ci-checks-tf
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled]
+    paths:
+      - 'applications/**'
+      - 'functions/**'
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    container: ghcr.io/antonbabenko/pre-commit-terraform:v1.99.5
+    strategy:
+      matrix:
+        folder:
+          - applications
+          - functions
+    steps:
+      - uses: actions/checkout@v3
+
+      #- name: 'setup::install-terramate'
+      #  run: |
+      #    apk add --no-cache wget tar bash
+      #    wget -qO terramate.tar.gz \
+      #      https://github.com/terramate-io/terramate/releases/latest/download/terramate_0.14.0_linux_x86_64.tar.gz
+      #    tar xzf terramate.tar.gz
+      #    mv terramate /usr/local/bin/
+      
+      - name: 'pre-commit::add-github-repo-safe'
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE     
+
+      - name: 'pre-commit::run-all-checks'
+        run: |
+          #!/bin/sh
+
+          # Your command to run in each subdirectory
+          run_command() {
+            echo "Checking for changes in: $1"
+            if ! git diff --quiet "origin/main" -- "$1"; then
+              echo "##### All-checks in: $1"
+              (cd "$1" && pre-commit run --config ../../.pre-commit-config.yaml -a --show-diff-on-failure -v && cd -)
+            else
+              echo "No changes in $1, skipping."
+            fi
+          }
+
+          # Loop through applications and functions folders
+          for base in ${{ matrix.folder }}; do
+            if [ -d "$base" ]; then
+              for dir in "$base"/*; do
+                if [ -d "$dir" ]; then
+                  run_command "$dir"
+                fi
+              done
+            else
+              echo "Directory $base does not exist."
+            fi
+          done
+
+  label-required-semver:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'pr::check-required-semver'
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        with:
+          prefix_mode: true
+          one_of: "release/" # patch , minor , major
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
+  label-required-pr-type:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'pr::check-required-pr-type'
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        with:
+          any_of: bug,enhancement,documentation,security
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
+  label-do-not-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'pr::check-required-semver'
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        with:
+          none_of: do-not-merge
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
