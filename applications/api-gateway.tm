@@ -8,6 +8,8 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     }
 
     resource "aws_apigatewayv2_vpc_link" "vpc_link" {
+      count = var.api ? 1 : 0
+
       name = "${var.app_name}-${var.environment}-vpc-link"
       subnet_ids = var.private_subnets
       security_group_ids = [aws_security_group.vpc_link_sg.id]
@@ -15,25 +17,12 @@ generate_hcl "_auto_generated_api-gateway.tf" {
 
     resource "aws_apigatewayv2_integration" "alb_integration" {
       count = var.api ? 1 : 0
-
-      api_id                 = aws_apigatewayv2_api.api[0].id
-      integration_type       = "HTTP_PROXY"
-      integration_uri        = var.alb.listener_arn
-      integration_method     = "ANY"
-      connection_type        = "VPC_LINK"
-      connection_id          = aws_apigatewayv2_vpc_link.vpc_link.id
-      payload_format_version = "1.0"
-    }
-
-    resource "aws_apigatewayv2_integration" "alb_integration_proxy" {
-      count = var.api ? 1 : 0
-
-      api_id                 = aws_apigatewayv2_api.api[0].id
-      integration_type       = "HTTP_PROXY"
-      integration_uri        = var.alb.listener_arn
-      integration_method     = "ANY"
-      connection_type        = "VPC_LINK"
-      connection_id          = aws_apigatewayv2_vpc_link.vpc_link.id
+      api_id = aws_apigatewayv2_api.api[0].id
+      integration_type = "HTTP_PROXY"
+      integration_uri  = var.alb.listener_arn
+      integration_method = "ANY"
+      connection_type = "VPC_LINK"
+      connection_id   = aws_apigatewayv2_vpc_link.vpc_link[0].id
       payload_format_version = "1.0"
     }
 
@@ -41,7 +30,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       count = var.api ? 1 : 0
 
       api_id     = aws_apigatewayv2_api.api[0].id
-      route_key  = "ANY /orders"
+      route_key  = "GET /orders"
       target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
     }
 
@@ -49,7 +38,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       count = var.api ? 1 : 0
       
       api_id     = aws_apigatewayv2_api.api[0].id
-      route_key  = "ANY /orders/{proxy+}"
+      route_key  = "GET /orders/{proxy+}"
       target     = "integrations/${aws_apigatewayv2_integration.alb_integration_proxy[0].id}"
     }
 
@@ -70,7 +59,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       api_id        = aws_apigatewayv2_api.api[0].id
       name          = var.environment
       deployment_id = aws_apigatewayv2_deployment.api_deployment[0].id
-      auto_deploy   = false
+      auto_deploy   = true
     }
   }
 }
