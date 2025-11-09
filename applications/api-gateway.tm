@@ -3,7 +3,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     resource "aws_apigatewayv2_api" "api" {
       count = var.api ? 1 : 0
 
-      name          = "${var.app-name}-${var.environment}"
+      name          = "${var.app_name}-${var.environment}"
       protocol_type = "HTTP"
     }
 
@@ -50,7 +50,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       name          = var.enviroment
       deployment_id = aws_apigatewayv2_deployment.api_deployment.id
       auto_deploy   = true
-      
+
       depends_on = [
        aws_apigatewayv2_api.api,
        aws_apigatewayv2_deployment.api_deployment
