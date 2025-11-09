@@ -60,7 +60,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       api_id        = aws_apigatewayv2_api.api[0].id
       name          = var.environment
       deployment_id = aws_apigatewayv2_deployment.api_deployment[0].id
-      auto_deploy   = true
+      auto_deploy   = false
     }
   }
 }
