@@ -13,6 +13,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       api_id                 = aws_apigatewayv2_api.api[0].id
       integration_type       = "HTTP_PROXY"
       integration_uri        = "http://${var.alb.alb_dns_name}/api/orders/{proxy}"
+      integration_method     = "ANY"
       payload_format_version = "1.0"
     }
 
