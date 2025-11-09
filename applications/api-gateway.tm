@@ -8,7 +8,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     }
 
     resource "aws_apigatewayv2_vpc_link" "vpc_link" {
-      name = "my-vpc-link"
+      name = "${var.app_name}-${var.environment}-vpc-link"
       subnet_ids = var.private_subnets
       security_group_ids = [aws_security_group.vpc_link_sg.id]
     }
@@ -18,7 +18,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
 
       api_id                 = aws_apigatewayv2_api.api[0].id
       integration_type       = "HTTP_PROXY"
-      integration_uri        = "http://${var.alb.alb_dns_name}/api/orders"
+      integration_uri        = var.alb.listener_arn
       integration_method     = "ANY"
       connection_type        = "VPC_LINK"
       connection_id          = aws_apigatewayv2_vpc_link.vpc_link.id
@@ -30,7 +30,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
 
       api_id                 = aws_apigatewayv2_api.api[0].id
       integration_type       = "HTTP_PROXY"
-      integration_uri        = "http://${var.alb.alb_dns_name}/api/orders/{proxy}"
+      integration_uri        = var.alb.listener_arn
       integration_method     = "ANY"
       connection_type        = "VPC_LINK"
       connection_id          = aws_apigatewayv2_vpc_link.vpc_link.id
