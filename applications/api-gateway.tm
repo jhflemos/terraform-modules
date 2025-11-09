@@ -7,6 +7,12 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       protocol_type = "HTTP"
     }
 
+    resource "aws_apigatewayv2_vpc_link" "vpc_link" {
+      name = "my-vpc-link"
+      subnet_ids = var.private_subnets
+      security_group_ids = [var.aws_security_group.vpc_link_sg]
+    }
+
     resource "aws_apigatewayv2_integration" "alb_integration" {
       count = var.api ? 1 : 0
 
@@ -14,6 +20,8 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       integration_type       = "HTTP_PROXY"
       integration_uri        = "http://${var.alb.alb_dns_name}/api/orders"
       integration_method     = "ANY"
+      connection_type        = "VPC_LINK"
+      connection_id          = aws_apigatewayv2_vpc_link.vpc_link.id
       payload_format_version = "1.0"
     }
 
@@ -24,6 +32,8 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       integration_type       = "HTTP_PROXY"
       integration_uri        = "http://${var.alb.alb_dns_name}/api/orders/{proxy}"
       integration_method     = "ANY"
+      connection_type        = "VPC_LINK"
+      connection_id          = aws_apigatewayv2_vpc_link.vpc_link.id
       payload_format_version = "1.0"
     }
 

@@ -24,5 +24,28 @@ generate_hcl "_auto_generated_security_group.tf" {
         Application = var.app_name
       }
     }
+
+    resource "aws_security_group" "vpc_link_sg" {
+      name        = "${var.app_name}-${var.environment}-api-gateway-vpc-link-sg"
+      description = "Allows API Gateway VPC Link to reach private ALB"
+      vpc_id      = var.vpc_id
+
+      # Outbound to ALB on HTTP (or HTTPS)
+      egress {
+        description = "Allow traffic to ALB"
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"] 
+      }
+
+      ingress {}
+
+      tags = { 
+        Name        = "${var.app_name}-${var.environment}-api-gateway-vpc-link-sg"
+        Application = var.app_name
+      }
+    }
+
   }
 }
