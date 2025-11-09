@@ -10,7 +10,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     resource "aws_apigatewayv2_vpc_link" "vpc_link" {
       name = "my-vpc-link"
       subnet_ids = var.private_subnets
-      security_group_ids = [var.aws_security_group.vpc_link_sg]
+      security_group_ids = [aws_security_group.vpc_link_sg]
     }
 
     resource "aws_apigatewayv2_integration" "alb_integration" {

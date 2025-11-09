@@ -39,8 +39,6 @@ generate_hcl "_auto_generated_security_group.tf" {
         cidr_blocks = ["0.0.0.0/0"] 
       }
 
-      ingress {}
-
       tags = { 
         Name        = "${var.app_name}-${var.environment}-api-gateway-vpc-link-sg"
         Application = var.app_name
