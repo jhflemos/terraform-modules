@@ -39,7 +39,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       
       api_id     = aws_apigatewayv2_api.api[0].id
       route_key  = "GET /orders/{proxy+}"
-      target     = "integrations/${aws_apigatewayv2_integration.alb_integration_proxy[0].id}"
+      target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
     }
 
     resource "aws_apigatewayv2_deployment" "api_deployment" {
