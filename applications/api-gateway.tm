@@ -8,35 +8,33 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     }
 
     resource "aws_apigatewayv2_integration" "alb_integration" {
+      count = var.api ? 1 : 0
+
       api_id                 = aws_apigatewayv2_api.api[0].id
       integration_type       = "HTTP_PROXY"
       integration_uri        = var.alb.alb_dns_name
       payload_format_version = "1.0"
-
-      depends_on = [aws_apigatewayv2_api.api]
     }
 
     resource "aws_apigatewayv2_route" "route" {
+      count = var.api ? 1 : 0
+
       api_id     = aws_apigatewayv2_api.api[0].id
       route_key  = "ANY /orders"
-      target     = "integrations/${aws_apigatewayv2_integration.alb_integration.id}"
-      depends_on = [
-       aws_apigatewayv2_api.api,
-       aws_apigatewayv2_integration.alb_integration
-      ]
+      target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
     }
 
     resource "aws_apigatewayv2_route" "proxy_route" {
+      count = var.api ? 1 : 0
+      
       api_id     = aws_apigatewayv2_api.api[0].id
       route_key  = "ANY /orders/{proxy+}"
       target     = "integrations/${aws_apigatewayv2_integration.alb_integration.id}"
-      depends_on = [
-       aws_apigatewayv2_api.api,
-       aws_apigatewayv2_integration.alb_integration
-      ]
     }
 
     resource "aws_apigatewayv2_deployment" "api_deployment" {
+      count = var.api ? 1 : 0
+
       api_id = aws_apigatewayv2_api.api[0].id
 
       depends_on = [
@@ -46,15 +44,12 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     }
 
     resource "aws_apigatewayv2_stage" "stage" {
+      count = var.api ? 1 : 0
+
       api_id        = aws_apigatewayv2_api.api[0].id
       name          = var.environment
-      deployment_id = aws_apigatewayv2_deployment.api_deployment.id
+      deployment_id = aws_apigatewayv2_deployment.api_deployment[0].id
       auto_deploy   = true
-
-      depends_on = [
-       aws_apigatewayv2_api.api,
-       aws_apigatewayv2_deployment.api_deployment
-      ]
     }
   }
 }
