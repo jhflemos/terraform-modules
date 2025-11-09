@@ -47,7 +47,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
 
     resource "aws_apigatewayv2_stage" "stage" {
       api_id        = aws_apigatewayv2_api.api[0].id
-      name          = var.enviroment
+      name          = var.environment
       deployment_id = aws_apigatewayv2_deployment.api_deployment.id
       auto_deploy   = true
 
