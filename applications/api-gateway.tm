@@ -11,6 +11,9 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     resource "aws_api_gateway_rest_api" "api" {
       name        = "${var.app_name}-${var.environment}"
       description = "REST API for ${var.app_name}"
+      endpoint_configuration {
+        types = ["REGIONAL"]
+      }
 
       policy = jsonencode({
         Version = "2012-10-17"
