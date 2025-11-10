@@ -59,45 +59,9 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener_rule" "api_rule" {
-      count        = var.api ? (try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0) : 0
-      listener_arn = aws_lb_listener.api[0].arn
-      priority     = local.elb.listener.priority
-
-      action {
-        type             = "forward"
-        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
-      }
-
-      dynamic "condition" {
-        for_each = lookup(local.elb.listener, "condition", [])
-        content {
-          dynamic "path_pattern" {
-            for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
-            content {
-              values = path_pattern.value.values
-            }
-          }
-
-          dynamic "host_header" {
-            for_each = lookup(condition.value, "host_header", null) == null ? [] : [condition.value.host_header]
-            content {
-              values = host_header.value.values
-            }
-          }
-        }
-      }
-
-      lifecycle {
-        ignore_changes = [
-          action
-        ]
-      }
-    }
-
-    resource "aws_lb_listener_rule" "app_rule" {
-      count        = var.api ? 0 : (try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0)
-      listener_arn = tm_one(aws_lb_listener.app[*].arn)
+    resource "aws_lb_listener_rule" "rule" {
+      count        = try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0
+      listener_arn = tm_ternary(global.api, aws_lb_listener.api[0].arn, aws_lb_listener.app[0].arn)
       priority     = local.elb.listener.priority
 
       action {
@@ -132,7 +96,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "api" {
-      count = var.api ? 1 : 0
+      count = global.api ? 1 : 0
 
       load_balancer_arn = var.elb.alb_arn
       port              = 80
@@ -149,7 +113,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "app" {
-      count = var.api ? 1 : 0
+      count = global.api ? 0 : 1
 
       load_balancer_arn = var.elb.alb_arn
       port              = 80
@@ -170,7 +134,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_target_group" "nlb_to_alb" {
-      count = var.api ? 1 : 0
+      count = global.api ? 1 : 0
 
       name        = "${var.app_name}-${var.environment}-nlb-tg"
       port        = 80
@@ -180,7 +144,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "nlb_listener" {
-      count = var.api ? 1 : 0
+      count = global.api ? 1 : 0
 
       load_balancer_arn = var.elb.nlb_arn
       port              = 80

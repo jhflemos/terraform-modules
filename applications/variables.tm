@@ -69,11 +69,5 @@ generate_hcl "_auto_generated_variables.tf" {
       description = "List of SSM parameters to inject as ECS secrets"
       default     = []
     }
-
-    variable "api" {
-      type        = bool
-      description = ""
-      default     = false
-    }
   }
 }
