@@ -120,7 +120,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       protocol          = "HTTP"
 
       default_action {
-        type = "fixed_response"
+        type = "fixed-response"
         fixed_response {
           content_type = "text/plain"
           message_body = "No matching path"
