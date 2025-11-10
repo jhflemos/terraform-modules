@@ -95,32 +95,38 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "app" {
+    resource "aws_lb_listener" "api" {
+      count = var.api ? 1 : 0
+
       load_balancer_arn = var.elb.alb_arn
       port              = 80
       protocol          = "HTTP"
 
       default_action {
-       type = var.api ? "forward" : "fixed-response"
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+      }
 
-       dynamic "forward" {
-         for_each = var.api ? [1] : []
-         content {
-           target_group {
-             target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
-           }
-         }
-       }
+      tags = {
+        Name = "${var.environment}-lb-listener-api"
+      }
+    }
 
-       dynamic "fixed_response" {
-         for_each = var.api ? [] : [1]
-         content {
-           content_type = "text/plain"
-           message_body = "No matching path"
-           status_code  = 404
-         }
-       }
-     }
+    resource "aws_lb_listener" "app" {
+      count = var.api ? 1 : 0
+
+      load_balancer_arn = var.elb.alb_arn
+      port              = 80
+      protocol          = "HTTP"
+
+      default_action {
+        type = "fixed_response"
+        fixed_response {
+          content_type = "text/plain"
+          message_body = "No matching path"
+          status_code  = 404
+        }
+      }
 
       tags = {
         Name = "${var.environment}-lb-listener-app"
@@ -128,7 +134,9 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_target_group" "nlb_to_alb" {
-      name        = "${var.environment}-nlb-tg"
+      count = var.api ? 1 : 0
+
+      name        = "${var.app_name}-${var.environment}-nlb-tg"
       port        = 80
       protocol    = "TCP"
       vpc_id      = var.vpc_id
@@ -136,13 +144,15 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "nlb_listener" {
+      count = var.api ? 1 : 0
+
       load_balancer_arn = var.elb.nlb_arn
       port              = 80
       protocol          = "TCP"
 
       default_action {
         type             = "forward"
-        target_group_arn = aws_lb_target_group.nlb_to_alb.arn
+        target_group_arn = aws_lb_target_group.nlb_to_alb[0].arn
       }
     }
 
