@@ -26,36 +26,11 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     #}
 
     resource "aws_api_gateway_vpc_link" "vpc_link" {
+      count = var.api ? 1 : 0
+      
       name        = "${var.app_name}-${var.environment}-vpc-link"
       target_arns = ["arn:aws:elasticloadbalancing:eu-west-1:748026688964:loadbalancer/app/prod-app-alb-api/ada1f94a9232134f"]  # The ALB ARN, not listener
     }
-
-    #resource "aws_apigatewayv2_integration" "alb_integration" {
-    #  count = var.api ? 1 : 0
-    #  api_id = aws_apigatewayv2_api.api[0].id
-    #  integration_type = "HTTP_PROXY"
-    #  integration_uri  = var.alb.listener_arn
-    #  integration_method = "ANY"
-    #  connection_type = "VPC_LINK"
-    #  connection_id   = aws_apigatewayv2_vpc_link.vpc_link[0].id
-    #  payload_format_version = "1.0"
-    #}
-
-    #resource "aws_apigatewayv2_route" "route" {
-    #  count = var.api ? 1 : 0
-#
-    #  api_id     = aws_apigatewayv2_api.api[0].id
-    #  route_key  = "GET /orders"
-    #  target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
-    #}
-
-     #resource "aws_apigatewayv2_route" "proxy_route" {
-    #  count = var.api ? 1 : 0
-    #  
-    #  api_id     = aws_apigatewayv2_api.api[0].id
-    #  route_key  = "GET /orders/{proxy+}"
-    #  target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
-    #}
 
     resource "aws_api_gateway_resource" "orders" {
       count = var.api ? 1 : 0
