@@ -7,6 +7,10 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     #  protocol_type = "HTTP"
     #}
 
+    data "aws_lb" "alb" {
+     arn  = var.alb.alb_arn
+   }
+
     resource "aws_api_gateway_rest_api" "api" {
       count = var.api ? 1 : 0
 
@@ -76,7 +80,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method             = aws_api_gateway_method.orders_method[0].http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${var.alb.alb_dns_name}/api/orders"
+      uri                     = "http://${data.aws_lb.alb.dns_name}/api/orders"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
     }
@@ -89,7 +93,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method             = aws_api_gateway_method.orders_proxy_method[0].http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${var.alb.alb_dns_name}/api/orders/{proxy}"
+      uri                     = "http://${data.aws_lb.alb.dns_name}/api/orders/{proxy}"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
     }

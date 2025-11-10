@@ -106,13 +106,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "https" {
-      count = var.route53 ? 1 : 0
+    resource "aws_lb_listener" "http" {
+      count = var.api ? 0 : 1
 
       load_balancer_arn = var.alb.alb_arn
       port              = 443
-      protocol          = "HTTPS"
-      certificate_arn   = var.alb.route53_cert_arn
+      protocol          = "HTTP"
 
       default_action {
         type = "fixed-response"
@@ -125,37 +124,6 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
       tags = {
         Name = "${var.environment}-lb-listener-https"
-      }
-    }
-
-    resource "aws_lb_listener" "http" {
-      count = var.api ? 0 : 1
-
-      load_balancer_arn = var.alb.alb_arn
-      port              = 80
-      protocol          = "HTTP"
-
-      dynamic "default_action" {
-        for_each = [1]
-        content {
-          type = var.route53 ? "redirect" : "fixed-response"
-
-          redirect {
-            port        = "443"
-            protocol    = "HTTPS"
-            status_code = "HTTP_301"
-          }
-
-          fixed_response {
-            content_type = "text/plain"
-            message_body = "No matching path"
-            status_code  = 404
-          }
-        }
-      }
-      
-      tags = {
-        Name = "${var.environment}-lb-listener-http"
       }
     }
 

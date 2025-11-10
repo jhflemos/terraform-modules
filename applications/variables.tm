@@ -42,10 +42,8 @@ generate_hcl "_auto_generated_variables.tf" {
 
     variable "alb" {
       type = object({
-        alb_arn          = string
-        alb_dns_name     = string
-        alb_sg_id        = string
-        route53_cert_arn = string
+        alb_arn   = string
+        alb_sg_id = string
         health_check = object({
           path                = string
           interval            = number
@@ -93,12 +91,6 @@ generate_hcl "_auto_generated_variables.tf" {
     }
 
     variable "api" {
-      type        = bool
-      description = ""
-      default     = false
-    }
-
-    variable "route53" {
       type        = bool
       description = ""
       default     = false
