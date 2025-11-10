@@ -12,7 +12,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
         }
       }
 
-      alb = merge(local.elb_defaults, var.elb)
+      elb = merge(local.elb_defaults, var.elb)
     }
 
     resource "aws_lb_target_group" "app_lb_service_tg_blue" {
