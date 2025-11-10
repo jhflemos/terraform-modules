@@ -23,11 +23,6 @@ generate_hcl "_auto_generated_api-gateway.tf" {
             Principal = "*"
             Action = "execute-api:Invoke"
             Resource = "*"
-            Condition = {
-              StringEquals = {
-                "aws:SourceVpc" = var.vpc_id
-              }
-            }
           }
         ]
       })
