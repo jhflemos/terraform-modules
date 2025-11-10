@@ -87,6 +87,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
           }
         }
       }
+
+      lifecycle {
+        ignore_changes = [
+          action
+        ]
+      }
     }
 
   }
