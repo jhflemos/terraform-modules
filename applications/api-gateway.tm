@@ -5,15 +5,12 @@ generate_hcl "_auto_generated_api-gateway.tf" {
   content {
 
     data "aws_lb" "elb" {
-     arn  = var.elb.nlb_arn
-   }
+      arn  = var.elb.nlb_arn
+    }
 
     resource "aws_api_gateway_rest_api" "api" {
       name        = "${var.app_name}-${var.environment}"
       description = "REST API for ${var.app_name}"
-      endpoint_configuration {
-        types = ["PRIVATE"]
-      }
 
       policy = jsonencode({
         Version = "2012-10-17"
