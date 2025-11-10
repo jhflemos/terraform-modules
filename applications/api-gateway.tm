@@ -171,15 +171,11 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     ##############################################
 
     output "api_invoke_url" {
-      count = var.api ? 1 : 0
-
-      value = aws_api_gateway_stage.stage[0].invoke_url
+      value = var.api ? aws_api_gateway_stage.stage[0].invoke_url : null
     }
 
     output "api_key_ssm_path" {
-      count = var.api ? 1 : 0
-      
-      value = aws_ssm_parameter.api_key[0].name
+      value = var.api ? aws_ssm_parameter.api_key[0].name : null
     }
    
   }
