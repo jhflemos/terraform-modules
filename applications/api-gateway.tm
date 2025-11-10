@@ -76,7 +76,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method             = aws_api_gateway_method.orders_method[0].http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${var.alb.dns_name}/api/orders"
+      uri                     = "http://${var.alb.alb_dns_name}/api/orders"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
     }
@@ -89,7 +89,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method             = aws_api_gateway_method.orders_proxy_method[0].http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${var.alb.dns_name}/api/orders/{proxy}"
+      uri                     = "http://${var.alb.alb_dns_name}/api/orders/{proxy}"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
     }
