@@ -106,7 +106,9 @@ generate_hcl "_auto_generated_load_balance.tf" {
        dynamic "forward" {
          for_each = var.api ? [1] : []
          content {
-           target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+           target_group {
+             target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+           }
          }
        }
 
