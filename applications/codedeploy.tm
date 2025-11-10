@@ -30,7 +30,7 @@ generate_hcl "_auto_generated_code_deploy.tf" {
             name = aws_lb_target_group.app_lb_service_tg_green.name
           }
           prod_traffic_route {
-            listener_arns = [var.api ? aws_lb_listener.api.arn : aws_lb_listener.app.arn]
+            listener_arns = [var.api ? aws_lb_listener.api[0].arn : aws_lb_listener.app[0].arn]
           }
         }
       }
