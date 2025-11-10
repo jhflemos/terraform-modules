@@ -59,6 +59,10 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method   = "ANY"
       authorization = "NONE"
       api_key_required = true
+
+      request_parameters = {
+        "method.request.path.id" = true
+      }
     }
 
     resource "aws_api_gateway_integration" "alb_integration_orders" {
@@ -81,6 +85,10 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       uri                     = "http://${data.aws_lb.elb.dns_name}/api/orders/{id}"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link.id
+
+      request_parameters = {
+        "integration.request.path.id" = "method.request.path.id"
+      }
     }
    
     resource "aws_api_gateway_deployment" "deployment" {
@@ -141,18 +149,6 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       key_id        = aws_api_gateway_api_key.api_key.id
       key_type      = "API_KEY"
       usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
-    }
-
-    ##############################################
-    # Outputs
-    ##############################################
-
-    output "api_invoke_url" {
-      value = aws_api_gateway_stage.stage.invoke_url
-    }
-
-    output "api_key_ssm_path" {
-      value = aws_ssm_parameter.api_key.name
     }
    
   }
