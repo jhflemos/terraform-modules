@@ -52,7 +52,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
 
       rest_api_id = aws_api_gateway_rest_api.api[0].id
       parent_id   = aws_api_gateway_resource.orders[0].id
-      path_part   = "{proxy+}"
+      path_part   = "{id}"
     }
 
     resource "aws_api_gateway_method" "orders_method" {
@@ -96,7 +96,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method             = aws_api_gateway_method.orders_proxy_method[0].http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${data.aws_lb.alb.dns_name}/api/orders/{proxy}"
+      uri                     = "http://${data.aws_lb.alb.dns_name}/api/orders/{id}"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
     }
