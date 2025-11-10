@@ -61,7 +61,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
     resource "aws_lb_listener_rule" "rules" {
       count        = try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0
-      listener_arn = var.api ? aws_lb_listener.api[0].arn : aws_lb_listener.app[0].arn
+      listener_arn = var.api ? try(aws_lb_listener.api[0].arn, null) : try(aws_lb_listener.app[0].arn, null)
       priority     = local.elb.listener.priority
 
       action {
