@@ -95,18 +95,52 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "http_api" {
+    resource "aws_lb_listener" "app" {
       load_balancer_arn = var.elb.alb_arn
       port              = 80
       protocol          = "HTTP"
 
       default_action {
-        type             = "forward"
-        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
-      }
+       type = var.api ? "forward" : "fixed-response"
+
+       dynamic "forward" {
+         for_each = var.api ? [1] : []
+         content {
+           target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+         }
+       }
+
+       dynamic "fixed_response" {
+         for_each = var.api ? [] : [1]
+         content {
+           content_type = "text/plain"
+           message_body = "No matching path"
+           status_code  = 404
+         }
+       }
+     }
 
       tags = {
-        Name = "${var.environment}-lb-listener-http-api"
+        Name = "${var.environment}-lb-listener-app"
+      }
+    }
+
+    resource "aws_lb_target_group" "nlb_to_alb" {
+      name        = "${global.environment}-nlb-tg"
+      port        = 80
+      protocol    = "TCP"
+      vpc_id      = module.vpc.vpc_id
+      target_type = "alb"
+    }
+
+    resource "aws_lb_listener" "nlb_listener" {
+      load_balancer_arn = var.elb.nlb_arn
+      port              = 80
+      protocol          = "TCP"
+
+      default_action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.nlb_to_alb.arn
       }
     }
 
