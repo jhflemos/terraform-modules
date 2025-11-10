@@ -62,7 +62,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       auto_deploy   = false
     }
 
-    resource "aws_apigatewayv2_api_key" "api_key" {
+    resource "aws_apigateway_api_key" "api_key" {
       name    = "${var.app_name}-${var.environment}-key"
       enabled = true
     }
@@ -70,14 +70,14 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     # -----------------------
     # Usage Plan
     # -----------------------
-    resource "aws_apigatewayv2_usage_plan" "usage_plan" {
+    resource "aws_apigateway_usage_plan" "usage_plan" {
       name = "${var.app_name}-${var.environment}-usage-plan"
     }
 
     # -----------------------
     # Usage Plan Key (connects the API key to the plan)
     # -----------------------
-    resource "aws_apigatewayv2_usage_plan_key" "plan_key" {
+    resource "aws_apigateway_usage_plan_key" "plan_key" {
       key_id        = aws_apigatewayv2_api_key.api_key.id
       key_type      = "API_KEY"
       usage_plan_id = aws_apigatewayv2_usage_plan.usage_plan.id
@@ -86,7 +86,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     # -----------------------
     # API Gateway Route Settings — Require API key
     # -----------------------
-    resource "aws_apigatewayv2_route_settings" "orders_route_settings" {
+    resource "aws_apigateway_route_settings" "orders_route_settings" {
       api_id = aws_apigatewayv2_api.api[0].id
       stage_name = aws_apigatewayv2_stage.prod.name
 
