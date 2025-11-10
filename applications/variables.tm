@@ -97,5 +97,11 @@ generate_hcl "_auto_generated_variables.tf" {
       description = ""
       default     = false
     }
+
+    variable "route53" {
+      type        = bool
+      description = ""
+      default     = false
+    }
   }
 }

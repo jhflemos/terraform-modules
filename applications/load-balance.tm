@@ -61,7 +61,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
     resource "aws_lb_listener_rule" "rules" {
       count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
-      listener_arn = var.api ? aws_lb_listener.api.arn : aws_lb_listener.http.arn
+      listener_arn = var.api ? aws_lb_listener.api[0].arn : aws_lb_listener.http[0].arn
       priority     = local.alb.listener.priority
 
       action {
@@ -107,7 +107,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "https" {
-      count = global.route53 ? 1 : 0
+      count = var.route53 ? 1 : 0
 
       load_balancer_arn = var.alb.alb_arn
       port              = 443
@@ -138,7 +138,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       dynamic "default_action" {
         for_each = [1]
         content {
-          type = global.route53 ? "redirect" : "fixed-response"
+          type = var.route53 ? "redirect" : "fixed-response"
 
           redirect {
             port        = "443"
