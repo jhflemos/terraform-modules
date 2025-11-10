@@ -144,13 +144,16 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
       health_check {
         port = "traffic-port"
+        protocol = "HTTP"
+        path     = "/health"
       }
+ 
     }
 
     resource "aws_lb_target_group_attachment" "alb_target" {
       count = global.api ? 1 : 0
 
-      target_group_arn = aws_lb_target_group.nlb_to_alb_tg.arn
+      target_group_arn = aws_lb_target_group.nlb_to_alb.arn
       target_id        = var.elb.alb_arn
     }
 
