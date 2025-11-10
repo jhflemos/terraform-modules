@@ -129,7 +129,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       name        = "${var.environment}-nlb-tg"
       port        = 80
       protocol    = "TCP"
-      vpc_id      = module.vpc.vpc_id
+      vpc_id      = var.vpc_id
       target_type = "alb"
     }
 
