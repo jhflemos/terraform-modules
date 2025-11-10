@@ -122,7 +122,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     resource "aws_ssm_parameter" "api_key" {
       count = var.api ? 1 : 0
 
-      name        = "/${var.app_name}/${var.environment}/api_key"
+      name        = "/app/${var.app_name}/${var.environment}/api_key"
       description = "API Gateway key for ${var.app_name}"
       type        = "SecureString"
       value       = random_password.api_key[0].result
@@ -171,10 +171,14 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     ##############################################
 
     output "api_invoke_url" {
-      value = "${aws_api_gateway_stage.stage[0].invoke_url}"
+      count = var.api ? 1 : 0
+
+      value = aws_api_gateway_stage.stage[0].invoke_url
     }
 
     output "api_key_ssm_path" {
+      count = var.api ? 1 : 0
+      
       value = aws_ssm_parameter.api_key[0].name
     }
    
