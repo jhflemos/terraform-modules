@@ -36,7 +36,7 @@ generate_hcl "_auto_generated_security_group.tf" {
         from_port   = 80
         to_port     = 80
         protocol    = "tcp"
-        cidr_blocks = [var.elb.alb_sg] 
+        cidr_blocks = [var.elb.alb_sg_id] 
       }
 
       tags = { 
