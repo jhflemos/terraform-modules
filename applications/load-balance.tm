@@ -126,7 +126,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_target_group" "nlb_to_alb" {
-      name        = "${global.environment}-nlb-tg"
+      name        = "${var.environment}-nlb-tg"
       port        = 80
       protocol    = "TCP"
       vpc_id      = module.vpc.vpc_id
