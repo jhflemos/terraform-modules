@@ -1,7 +1,7 @@
 generate_hcl "_auto_generated_load_balance.tf" {
   content {
     locals {
-      alb_defaults = {
+      elb_defaults = {
         health_check = {
           path                = "/"
           interval            = 30
@@ -12,7 +12,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
         }
       }
 
-      alb = merge(local.alb_defaults, var.elb)
+      alb = merge(local.elb_defaults, var.elb)
     }
 
     resource "aws_lb_target_group" "app_lb_service_tg_blue" {
@@ -23,12 +23,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       target_type = "ip"
 
       health_check {
-        path                = local.alb.health_check.path
-        interval            = local.alb.health_check.interval
-        timeout             = local.alb.health_check.timeout
-        healthy_threshold   = local.alb.health_check.healthy_threshold
-        unhealthy_threshold = local.alb.health_check.unhealthy_threshold
-        matcher             = local.alb.health_check.matcher
+        path                = local.elb.health_check.path
+        interval            = local.elb.health_check.interval
+        timeout             = local.elb.health_check.timeout
+        healthy_threshold   = local.elb.health_check.healthy_threshold
+        unhealthy_threshold = local.elb.health_check.unhealthy_threshold
+        matcher             = local.elb.health_check.matcher
       }
 
       tags = {
@@ -45,12 +45,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       target_type = "ip"
 
       health_check {
-        path                = local.alb.health_check.path
-        interval            = local.alb.health_check.interval
-        timeout             = local.alb.health_check.timeout
-        healthy_threshold   = local.alb.health_check.healthy_threshold
-        unhealthy_threshold = local.alb.health_check.unhealthy_threshold
-        matcher             = local.alb.health_check.matcher
+        path                = local.elb.health_check.path
+        interval            = local.elb.health_check.interval
+        timeout             = local.elb.health_check.timeout
+        healthy_threshold   = local.elb.health_check.healthy_threshold
+        unhealthy_threshold = local.elb.health_check.unhealthy_threshold
+        matcher             = local.elb.health_check.matcher
       }
 
       tags = {
@@ -60,9 +60,9 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener_rule" "rules" {
-      count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
-      listener_arn = aws_lb_listener.http.arn
-      priority     = local.alb.listener.priority
+      count        = try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0
+      listener_arn = var.elb.listener_arn
+      priority     = local.elb.listener.priority
 
       action {
         type             = "forward"
@@ -70,7 +70,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
 
       dynamic "condition" {
-        for_each = lookup(local.alb.listener, "condition", [])
+        for_each = lookup(local.elb.listener, "condition", [])
         content {
           dynamic "path_pattern" {
             for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
