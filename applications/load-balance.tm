@@ -18,7 +18,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     resource "aws_lb_target_group" "app_lb_service_tg_blue" {
       name        = "${var.app_name}-${var.environment}-blue"
       port        = 8080
-      protocol    = "HTTP"
+      protocol    = var.api ? "TCP" : "HTTP"
       vpc_id      = var.vpc_id
       target_type = "ip"
 
@@ -40,7 +40,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     resource "aws_lb_target_group" "app_lb_service_tg_green" {
       name        = "${var.app_name}-${var.environment}-green"
       port        = 8080
-      protocol    = "HTTP"
+      protocol    = var.api ? "TCP" : "HTTP"
       vpc_id      = var.vpc_id
       target_type = "ip"
 
