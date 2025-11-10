@@ -1,11 +1,5 @@
 generate_hcl "_auto_generated_api-gateway.tf" {
   content {
-    #resource "aws_apigatewayv2_api" "api" {
-    #  count = var.api ? 1 : 0
-#
-    #  name          = "${var.app_name}-${var.environment}"
-    #  protocol_type = "HTTP"
-    #}
 
     data "aws_lb" "alb" {
      arn  = var.alb.alb_arn
@@ -19,15 +13,24 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       endpoint_configuration {
         types = ["PRIVATE"]
       }
-    }
 
-    #resource "aws_apigatewayv2_vpc_link" "vpc_link" {
-    #  count = var.api ? 1 : 0
-#
-    #  name = "${var.app_name}-${var.environment}-vpc-link"
-    #  subnet_ids = var.private_subnets
-    #  security_group_ids = [aws_security_group.vpc_link_sg.id]
-    #}
+      policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+          {
+            Effect = "Allow"
+            Principal = "*"
+            Action = "execute-api:Invoke"
+            Resource = "*"
+            Condition = {
+              StringEquals = {
+                "aws:SourceVpc" = var.vpc_id
+              }
+            }
+          }
+        ]
+      })
+    }
 
     resource "aws_api_gateway_vpc_link" "vpc_link" {
       count = var.api ? 1 : 0
