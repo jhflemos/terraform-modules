@@ -96,7 +96,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener" "http_api" {
-      load_balancer_arn = aws_lb.app_alb_api.arn
+      load_balancer_arn = var.elb.alb_arn
       port              = 80
       protocol          = "HTTP"
 
