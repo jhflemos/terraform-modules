@@ -89,5 +89,22 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
+    resource "aws_lb_listener" "api" {
+      count = var.api ? 1 : 0
+      
+      load_balancer_arn = aws_lb.app_alb_api.arn
+      port              = 80
+      protocol          = "TCP"
+
+      default_action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+      }
+      
+      tags = {
+        Name = "${global.environment}-lb-listener-http-api"
+      }
+    }
+
   }
 }
