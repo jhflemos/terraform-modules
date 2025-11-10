@@ -163,6 +163,8 @@ generate_hcl "_auto_generated_api-gateway.tf" {
         limit  = 10000
         period = "MONTH"
       }
+
+      depends_on = [aws_api_gateway_stage.stage]
     }
 
     resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
