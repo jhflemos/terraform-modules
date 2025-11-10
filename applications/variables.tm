@@ -43,6 +43,7 @@ generate_hcl "_auto_generated_variables.tf" {
     variable "alb" {
       type = object({
         listener_arn = string
+        alb_arn      = string
         alb_dns_name = string
         alb_sg_id    = string
         health_check = object({
