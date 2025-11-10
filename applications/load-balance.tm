@@ -91,7 +91,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
     resource "aws_lb_listener" "api" {
       count = var.api ? 1 : 0
-      
+
       load_balancer_arn = aws_lb.app_alb_api.arn
       port              = 80
       protocol          = "TCP"
@@ -102,7 +102,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
       
       tags = {
-        Name = "${global.environment}-lb-listener-http-api"
+        Name = "${var.environment}-lb-listener-http-api"
       }
     }
 
