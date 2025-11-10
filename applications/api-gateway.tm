@@ -1,8 +1,8 @@
 generate_hcl "_auto_generated_api-gateway.tf" {
   content {
 
-    data "aws_lb" "alb" {
-     arn  = var.elb.alb_arn
+    data "aws_lb" "elb" {
+     arn  = var.elb.nlb_arn
    }
 
     resource "aws_api_gateway_rest_api" "api" {
@@ -36,7 +36,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       count = var.api ? 1 : 0
       
       name        = "${var.app_name}-${var.environment}-vpc-link"
-      target_arns = [var.elb.alb_arn]
+      target_arns = [var.elb.nlb_arn]
     }
 
     resource "aws_api_gateway_resource" "orders" {
@@ -83,7 +83,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method             = aws_api_gateway_method.orders_method[0].http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${data.aws_lb.alb.dns_name}/api/orders"
+      uri                     = "http://${data.aws_lb.elb.dns_name}/api/orders"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
     }
@@ -96,7 +96,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       http_method             = aws_api_gateway_method.orders_proxy_method[0].http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${data.aws_lb.alb.dns_name}/api/orders/{id}"
+      uri                     = "http://${data.aws_lb.elb.dns_name}/api/orders/{id}"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
     }
