@@ -40,29 +40,9 @@ generate_hcl "_auto_generated_variables.tf" {
       description = "KMS key used to encrypt and decrypt data"
     }
 
-    variable "alb" {
-      type = object({
-        alb_arn   = string
-        alb_sg_id = string
-        health_check = object({
-          path                = string
-          interval            = number
-          timeout             = number
-          healthy_threshold   = number
-          unhealthy_threshold = number
-          matcher             = string
-        })
-        listener = object({
-          priority  = number
-          condition = list(object({
-            path_pattern = object({
-              values = list(string)
-            })
-          }))
-        })
-      })
-
-      description = "ALB configuration with listener and health check settings"
+    variable "elb" {
+      type = any
+      description = "ELB configuration with listener and health check settings"
     }
 
     variable "private_subnets" {

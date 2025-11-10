@@ -18,7 +18,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     resource "aws_lb_target_group" "app_lb_service_tg_blue" {
       name        = "${var.app_name}-${var.environment}-blue"
       port        = 8080
-      protocol    = var.api ? "TCP" : "HTTP"
+      protocol    = "HTTP"
       vpc_id      = var.vpc_id
       target_type = "ip"
 
@@ -40,7 +40,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     resource "aws_lb_target_group" "app_lb_service_tg_green" {
       name        = "${var.app_name}-${var.environment}-green"
       port        = 8080
-      protocol    = var.api ? "TCP" : "HTTP"
+      protocol    = "HTTP"
       vpc_id      = var.vpc_id
       target_type = "ip"
 
@@ -60,7 +60,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     }
 
     resource "aws_lb_listener_rule" "rules" {
-      count        = var.api ? 0 : try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
+      count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
       listener_arn = aws_lb_listener.http[0].arn
       priority     = local.alb.listener.priority
 
@@ -89,28 +89,11 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener" "api" {
-      count = var.api ? 1 : 0
+    resource "aws_lb_listener" "http" {
+      #count = var.api ? 0 : 1
 
       load_balancer_arn = var.alb.alb_arn
       port              = 80
-      protocol          = "TCP"
-
-      default_action {
-        type             = "forward"
-        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
-      }
-      
-      tags = {
-        Name = "${var.environment}-lb-listener-http-api"
-      }
-    }
-
-    resource "aws_lb_listener" "http" {
-      count = var.api ? 0 : 1
-
-      load_balancer_arn = var.alb.alb_arn
-      port              = 443
       protocol          = "HTTP"
 
       default_action {
