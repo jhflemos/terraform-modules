@@ -12,7 +12,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
         }
       }
 
-      alb = merge(local.alb_defaults, var.alb)
+      alb = merge(local.alb_defaults, var.elb)
     }
 
     resource "aws_lb_target_group" "app_lb_service_tg_blue" {
@@ -92,7 +92,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
     resource "aws_lb_listener" "http" {
       #count = var.api ? 0 : 1
 
-      load_balancer_arn = var.alb.alb_arn
+      load_balancer_arn = var.elb.alb_arn
       port              = 80
       protocol          = "HTTP"
 

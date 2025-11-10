@@ -2,7 +2,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
   content {
 
     data "aws_lb" "alb" {
-     arn  = var.alb.alb_arn
+     arn  = var.elb.alb_arn
    }
 
     resource "aws_api_gateway_rest_api" "api" {
@@ -36,7 +36,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       count = var.api ? 1 : 0
       
       name        = "${var.app_name}-${var.environment}-vpc-link"
-      target_arns = [var.alb.alb_arn]
+      target_arns = [var.elb.alb_arn]
     }
 
     resource "aws_api_gateway_resource" "orders" {

@@ -9,7 +9,7 @@ generate_hcl "_auto_generated_security_group.tf" {
         from_port       = 8080
         to_port         = 8080
         protocol        = "tcp"
-        security_groups = [var.alb.alb_sg_id]
+        security_groups = [var.elb.alb_sg_id]
       }
 
       egress {
@@ -36,7 +36,7 @@ generate_hcl "_auto_generated_security_group.tf" {
         from_port   = 80
         to_port     = 80
         protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"] 
+        cidr_blocks = [var.elb.alb_sg] 
       }
 
       tags = { 
