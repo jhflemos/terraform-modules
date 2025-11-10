@@ -29,7 +29,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       count = var.api ? 1 : 0
       
       name        = "${var.app_name}-${var.environment}-vpc-link"
-      target_arns = ["arn:aws:elasticloadbalancing:eu-west-1:748026688964:loadbalancer/app/prod-app-alb-api/ada1f94a9232134f"]  # The ALB ARN, not listener
+      target_arns = [var.alb.alb_arn]
     }
 
     resource "aws_api_gateway_resource" "orders" {
