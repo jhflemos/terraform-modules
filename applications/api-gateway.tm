@@ -104,7 +104,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       rest_api_id = aws_api_gateway_rest_api.api[0].id
     }
 
-    resource "aws_api_gateway_stage" "example" {
+    resource "aws_api_gateway_stage" "stage" {
       count = var.api ? 1 : 0
 
       deployment_id = aws_api_gateway_deployment.deployment[0].id
@@ -144,7 +144,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
 
       api_stages {
         api_id = aws_api_gateway_rest_api.api[0].id
-        stage  = aws_api_gateway_deployment.deployment[0].stage_name
+        stage  = var.environment
       }
 
       throttle_settings {
@@ -171,7 +171,7 @@ generate_hcl "_auto_generated_api-gateway.tf" {
     ##############################################
 
     output "api_invoke_url" {
-      value = "${aws_api_gateway_deployment.deployment[0].invoke_url}"
+      value = "${aws_api_gateway_stage.stage[0].invoke_url}"
     }
 
     output "api_key_ssm_path" {
