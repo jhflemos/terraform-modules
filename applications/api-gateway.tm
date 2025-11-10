@@ -4,6 +4,16 @@ generate_hcl "_auto_generated_api-gateway.tf" {
   ])
   content {
 
+    locals {
+      # Flatten paths and map each path to its parent
+      path_map = { for path in var.api.paths :
+        path => {
+          parent = length(split("/", path)) == 1 ? aws_api_gateway_rest_api.api.root_resource_id : join("/", slice(split("/", path), 0, -1))
+          path_part = split("/", path)[length(split("/", path))-1]
+        }
+      }
+    }
+
     data "aws_lb" "elb" {
       arn  = var.elb.nlb_arn
     }
@@ -33,68 +43,108 @@ generate_hcl "_auto_generated_api-gateway.tf" {
       target_arns = [var.elb.nlb_arn]
     }
 
-    resource "aws_api_gateway_resource" "orders" {
+    resource "aws_api_gateway_resource" "resources" {
+      for_each = local.path_map
+
       rest_api_id = aws_api_gateway_rest_api.api.id
-      parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-      path_part   = "orders"
+      parent_id   = each.value.parent == aws_api_gateway_rest_api.api.root_resource_id ? aws_api_gateway_rest_api.api.root_resource_id : aws_api_gateway_resource.resources[each.value.parent].id
+      path_part   = each.value.path_part
     }
 
-    resource "aws_api_gateway_resource" "orders_proxy" {
-      rest_api_id = aws_api_gateway_rest_api.api.id
-      parent_id   = aws_api_gateway_resource.orders.id
-      path_part   = "{id}"
-    }
+    #resource "aws_api_gateway_resource" "orders" {
+    #  rest_api_id = aws_api_gateway_rest_api.api.id
+    #  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+    #  path_part   = "orders"
+    #}
+#
+    #resource "aws_api_gateway_resource" "orders_proxy" {
+    #  rest_api_id = aws_api_gateway_rest_api.api.id
+    #  parent_id   = aws_api_gateway_resource.orders.id
+    #  path_part   = "{id}"
+    #}
 
-    resource "aws_api_gateway_method" "orders_method" {
-      rest_api_id   = aws_api_gateway_rest_api.api.id
-      resource_id   = aws_api_gateway_resource.orders.id
-      http_method   = "ANY"
-      authorization = "NONE"
+    resource "aws_api_gateway_method" "methods" {
+      for_each = aws_api_gateway_resource.resources
+
+      rest_api_id      = aws_api_gateway_rest_api.api.id
+      resource_id      = each.value.id
+      http_method      = "ANY"
+      authorization    = "NONE"
       api_key_required = true
+
+      # Enable path parameter if needed
+      request_parameters = { for p in regexall("\\{(.*?)\\}", each.key) : "method.request.path.${p}" => true }
     }
 
-    resource "aws_api_gateway_method" "orders_proxy_method" {
-      rest_api_id   = aws_api_gateway_rest_api.api.id
-      resource_id   = aws_api_gateway_resource.orders_proxy.id
-      http_method   = "ANY"
-      authorization = "NONE"
-      api_key_required = true
 
-      request_parameters = {
-        "method.request.path.id" = true
-      }
-    }
+    #resource "aws_api_gateway_method" "orders_method" {
+    #  rest_api_id   = aws_api_gateway_rest_api.api.id
+    #  resource_id   = aws_api_gateway_resource.orders.id
+    #  http_method   = "ANY"
+    #  authorization = "NONE"
+    #  api_key_required = true
+    #}
+#
+    #resource "aws_api_gateway_method" "orders_proxy_method" {
+    #  rest_api_id   = aws_api_gateway_rest_api.api.id
+    #  resource_id   = aws_api_gateway_resource.orders_proxy.id
+    #  http_method   = "ANY"
+    #  authorization = "NONE"
+    #  api_key_required = true
+#
+    #  request_parameters = {
+    #    "method.request.path.id" = true
+    #  }
+    #}
 
-    resource "aws_api_gateway_integration" "alb_integration_orders" {
+
+    resource "aws_api_gateway_integration" "integrations" {
+      for_each = aws_api_gateway_method.methods
+
       rest_api_id             = aws_api_gateway_rest_api.api.id
-      resource_id             = aws_api_gateway_resource.orders.id
-      http_method             = aws_api_gateway_method.orders_method.http_method
+      resource_id             = each.value.resource_id
+      http_method             = each.value.http_method
       integration_http_method = "ANY"
       type                    = "HTTP_PROXY"
-      uri                     = "http://${data.aws_lb.elb.dns_name}/api/orders"
-      connection_type         = "VPC_LINK"
-      connection_id           = aws_api_gateway_vpc_link.vpc_link.id
-    }
-
-    resource "aws_api_gateway_integration" "alb_integration_orders_proxy" {
-      rest_api_id             = aws_api_gateway_rest_api.api.id
-      resource_id             = aws_api_gateway_resource.orders_proxy.id
-      http_method             = aws_api_gateway_method.orders_proxy_method.http_method
-      integration_http_method = "ANY"
-      type                    = "HTTP_PROXY"
-      uri                     = "http://${data.aws_lb.elb.dns_name}/api/orders/{id}"
       connection_type         = "VPC_LINK"
       connection_id           = aws_api_gateway_vpc_link.vpc_link.id
 
-      request_parameters = {
-        "integration.request.path.id" = "method.request.path.id"
-      }
+      uri = "http://${data.aws_lb.elb.dns_name}/api/${each.key}"
+
+      request_parameters = { for p in regexall("\\{(.*?)\\}", each.key) : "integration.request.path.${p}" => "method.request.path.${p}" }
     }
+
+
+    #resource "aws_api_gateway_integration" "alb_integration_orders" {
+    #  rest_api_id             = aws_api_gateway_rest_api.api.id
+    #  resource_id             = aws_api_gateway_resource.orders.id
+    #  http_method             = aws_api_gateway_method.orders_method.http_method
+    #  integration_http_method = "ANY"
+    #  type                    = "HTTP_PROXY"
+    #  uri                     = "http://${data.aws_lb.elb.dns_name}/api/orders"
+    #  connection_type         = "VPC_LINK"
+    #  connection_id           = aws_api_gateway_vpc_link.vpc_link.id
+    #}
+#
+    #resource "aws_api_gateway_integration" "alb_integration_orders_proxy" {
+    #  rest_api_id             = aws_api_gateway_rest_api.api.id
+    #  resource_id             = aws_api_gateway_resource.orders_proxy.id
+    #  http_method             = aws_api_gateway_method.orders_proxy_method.http_method
+    #  integration_http_method = "ANY"
+    #  type                    = "HTTP_PROXY"
+    #  uri                     = "http://${data.aws_lb.elb.dns_name}/api/orders/{id}"
+    #  connection_type         = "VPC_LINK"
+    #  connection_id           = aws_api_gateway_vpc_link.vpc_link.id
+#
+    #  request_parameters = {
+    #    "integration.request.path.id" = "method.request.path.id"
+    #  }
+    #}
    
     resource "aws_api_gateway_deployment" "deployment" {
       depends_on = [
-        aws_api_gateway_integration.alb_integration_orders,
-        aws_api_gateway_integration.alb_integration_orders_proxy
+        aws_api_gateway_integration.integrations,
+        aws_api_gateway_method.methods
       ]
       rest_api_id = aws_api_gateway_rest_api.api.id
     }
