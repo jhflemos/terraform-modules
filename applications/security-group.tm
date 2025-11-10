@@ -32,11 +32,11 @@ generate_hcl "_auto_generated_security_group.tf" {
 
       # Outbound to ALB on HTTP (or HTTPS)
       egress {
-        description = "Allow traffic to ALB"
-        from_port   = 80
-        to_port     = 80
-        protocol    = "tcp"
-        cidr_blocks = [var.elb.alb_sg_id] 
+        description     = "Allow traffic to ALB"
+        from_port       = 80
+        to_port         = 80
+        protocol        = "tcp"
+        security_groups = [var.elb.alb_sg_id] 
       }
 
       tags = { 
