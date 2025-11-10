@@ -1,99 +1,200 @@
 generate_hcl "_auto_generated_api-gateway.tf" {
   content {
-    resource "aws_apigatewayv2_api" "api" {
+    #resource "aws_apigatewayv2_api" "api" {
+    #  count = var.api ? 1 : 0
+#
+    #  name          = "${var.app_name}-${var.environment}"
+    #  protocol_type = "HTTP"
+    #}
+
+    resource "aws_api_gateway_rest_api" "api" {
       count = var.api ? 1 : 0
 
-      name          = "${var.app_name}-${var.environment}"
-      protocol_type = "HTTP"
+      name        = "${var.app_name}-${var.environment}"
+      description = "REST API for ${var.app_name}"
+      endpoint_configuration {
+        types = ["PRIVATE"]
+      }
     }
 
-    resource "aws_apigatewayv2_vpc_link" "vpc_link" {
-      count = var.api ? 1 : 0
+    #resource "aws_apigatewayv2_vpc_link" "vpc_link" {
+    #  count = var.api ? 1 : 0
+#
+    #  name = "${var.app_name}-${var.environment}-vpc-link"
+    #  subnet_ids = var.private_subnets
+    #  security_group_ids = [aws_security_group.vpc_link_sg.id]
+    #}
 
-      name = "${var.app_name}-${var.environment}-vpc-link"
-      subnet_ids = var.private_subnets
-      security_group_ids = [aws_security_group.vpc_link_sg.id]
+    resource "aws_api_gateway_vpc_link" "vpc_link" {
+      name        = "${var.app_name}-${var.environment}-vpc-link"
+      target_arns = ["arn:aws:elasticloadbalancing:eu-west-1:748026688964:loadbalancer/app/prod-app-alb-api/ada1f94a9232134f"]  # The ALB ARN, not listener
     }
 
-    resource "aws_apigatewayv2_integration" "alb_integration" {
+    #resource "aws_apigatewayv2_integration" "alb_integration" {
+    #  count = var.api ? 1 : 0
+    #  api_id = aws_apigatewayv2_api.api[0].id
+    #  integration_type = "HTTP_PROXY"
+    #  integration_uri  = var.alb.listener_arn
+    #  integration_method = "ANY"
+    #  connection_type = "VPC_LINK"
+    #  connection_id   = aws_apigatewayv2_vpc_link.vpc_link[0].id
+    #  payload_format_version = "1.0"
+    #}
+
+    #resource "aws_apigatewayv2_route" "route" {
+    #  count = var.api ? 1 : 0
+#
+    #  api_id     = aws_apigatewayv2_api.api[0].id
+    #  route_key  = "GET /orders"
+    #  target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
+    #}
+
+     #resource "aws_apigatewayv2_route" "proxy_route" {
+    #  count = var.api ? 1 : 0
+    #  
+    #  api_id     = aws_apigatewayv2_api.api[0].id
+    #  route_key  = "GET /orders/{proxy+}"
+    #  target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
+    #}
+
+    resource "aws_api_gateway_resource" "orders" {
       count = var.api ? 1 : 0
-      api_id = aws_apigatewayv2_api.api[0].id
-      integration_type = "HTTP_PROXY"
-      integration_uri  = var.alb.listener_arn
-      integration_method = "ANY"
-      connection_type = "VPC_LINK"
-      connection_id   = aws_apigatewayv2_vpc_link.vpc_link[0].id
-      payload_format_version = "1.0"
+
+      rest_api_id = aws_api_gateway_rest_api.api[0].id
+      parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+      path_part   = "orders"
     }
 
-    resource "aws_apigatewayv2_route" "route" {
+    resource "aws_api_gateway_resource" "orders_proxy" {
       count = var.api ? 1 : 0
 
-      api_id     = aws_apigatewayv2_api.api[0].id
-      route_key  = "GET /orders"
-      target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
+      rest_api_id = aws_api_gateway_rest_api.api[0].id
+      parent_id   = aws_api_gateway_resource.orders[0].id
+      path_part   = "{proxy+}"
     }
 
-    resource "aws_apigatewayv2_route" "proxy_route" {
+    resource "aws_api_gateway_method" "orders_method" {
       count = var.api ? 1 : 0
-      
-      api_id     = aws_apigatewayv2_api.api[0].id
-      route_key  = "GET /orders/{proxy+}"
-      target     = "integrations/${aws_apigatewayv2_integration.alb_integration[0].id}"
+
+      rest_api_id   = aws_api_gateway_rest_api.api[0].id
+      resource_id   = aws_api_gateway_resource.orders[0].id
+      http_method   = "ANY"
+      authorization = "NONE"
+      api_key_required = true
     }
 
-    resource "aws_apigatewayv2_deployment" "api_deployment" {
+    resource "aws_api_gateway_method" "orders_proxy_method" {
       count = var.api ? 1 : 0
 
-      api_id = aws_apigatewayv2_api.api[0].id
+      rest_api_id   = aws_api_gateway_rest_api.api[0].id
+      resource_id   = aws_api_gateway_resource.orders_proxy[0].id
+      http_method   = "ANY"
+      authorization = "NONE"
+      api_key_required = true
+    }
+
+    resource "aws_api_gateway_integration" "alb_integration_orders" {
+      count = var.api ? 1 : 0
+
+      rest_api_id             = aws_api_gateway_rest_api.api[0].id
+      resource_id             = aws_api_gateway_resource.orders[0].id
+      http_method             = aws_api_gateway_method.orders_method[0].http_method
+      integration_http_method = "ANY"
+      type                    = "HTTP_PROXY"
+      uri                     = "http://${var.alb.dns_name}/api/orders"
+      connection_type         = "VPC_LINK"
+      connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
+    }
+
+    resource "aws_api_gateway_integration" "alb_integration_orders_proxy" {
+      count = var.api ? 1 : 0
+
+      rest_api_id             = aws_api_gateway_rest_api.api[0].id
+      resource_id             = aws_api_gateway_resource.orders_proxy[0].id
+      http_method             = aws_api_gateway_method.orders_proxy_method[0].http_method
+      integration_http_method = "ANY"
+      type                    = "HTTP_PROXY"
+      uri                     = "http://${var.alb.dns_name}/api/orders/{proxy}"
+      connection_type         = "VPC_LINK"
+      connection_id           = aws_api_gateway_vpc_link.vpc_link[0].id
+    }
+   
+    resource "aws_api_gateway_deployment" "deployment" {
+      count = var.api ? 1 : 0
 
       depends_on = [
-        aws_apigatewayv2_route.route,
-        aws_apigatewayv2_route.proxy_route
+        aws_api_gateway_integration.alb_integration_orders,
+        aws_api_gateway_integration.alb_integration_orders_proxy
       ]
+      rest_api_id = aws_api_gateway_rest_api.api[0].id
+      stage_name  = var.environment
     }
 
-    resource "aws_apigatewayv2_stage" "stage" {
+    resource "random_password" "api_key" {
       count = var.api ? 1 : 0
 
-      api_id        = aws_apigatewayv2_api.api[0].id
-      name          = var.environment
-      deployment_id = aws_apigatewayv2_deployment.api_deployment[0].id
-      auto_deploy   = false
+      length  = 32
+      special = false
     }
 
-    resource "aws_apigateway_api_key" "api_key" {
-      name    = "${var.app_name}-${var.environment}-key"
-      enabled = true
+    resource "aws_ssm_parameter" "api_key" {
+      count = var.api ? 1 : 0
+
+      name        = "/${var.app_name}/${var.environment}/api_key"
+      description = "API Gateway key for ${var.app_name}"
+      type        = "SecureString"
+      value       = random_password.api_key[0].result
     }
 
-    # -----------------------
-    # Usage Plan
-    # -----------------------
-    resource "aws_apigateway_usage_plan" "usage_plan" {
+    resource "aws_api_gateway_api_key" "api_key" {
+      count = var.api ? 1 : 0
+
+      name        = "${var.app_name}-${var.environment}-api-key"
+      description = "API key for ${var.app_name}"
+      enabled     = true
+      value       = random_password.api_key[0].result
+    }
+
+    resource "aws_api_gateway_usage_plan" "usage_plan" {
+      count = var.api ? 1 : 0
+
       name = "${var.app_name}-${var.environment}-usage-plan"
+
+      api_stages {
+        api_id = aws_api_gateway_rest_api.api[0].id
+        stage  = aws_api_gateway_deployment.deployment[0].stage_name
+      }
+
+      throttle_settings {
+        burst_limit = 50
+        rate_limit  = 100
+      }
+
+      quota_settings {
+        limit  = 10000
+        period = "MONTH"
+      }
     }
 
-    # -----------------------
-    # Usage Plan Key (connects the API key to the plan)
-    # -----------------------
-    resource "aws_apigateway_usage_plan_key" "plan_key" {
-      key_id        = aws_apigatewayv2_api_key.api_key.id
+    resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
+      count = var.api ? 1 : 0
+
+      key_id        = aws_api_gateway_api_key.api_key[0].id
       key_type      = "API_KEY"
-      usage_plan_id = aws_apigatewayv2_usage_plan.usage_plan.id
+      usage_plan_id = aws_api_gateway_usage_plan.usage_plan[0].id
     }
 
-    # -----------------------
-    # API Gateway Route Settings — Require API key
-    # -----------------------
-    resource "aws_apigateway_route_settings" "orders_route_settings" {
-      api_id = aws_apigatewayv2_api.api[0].id
-      stage_name = aws_apigatewayv2_stage.prod.name
+    ##############################################
+    # Outputs
+    ##############################################
 
-      route_key = aws_apigatewayv2_route.route[0].route_key
-
-      throttling_burst_limit = 100
-      throttling_rate_limit  = 50
+    output "api_invoke_url" {
+      value = "${aws_api_gateway_deployment.deployment[0].invoke_url}"
     }
+
+    output "api_key_ssm_path" {
+      value = aws_ssm_parameter.api_key[0].name
+    }
+   
   }
 }
