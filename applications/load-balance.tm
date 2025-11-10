@@ -66,7 +66,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
 
       action {
         type             = "forward"
-        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+        target_group_arn = aws_lb_target_group.app_lb_service_tg_green.arn
       }
 
       dynamic "condition" {
