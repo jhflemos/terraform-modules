@@ -59,9 +59,45 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener_rule" "rules" {
-      count        = try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0
-      listener_arn = var.api ? try(aws_lb_listener.api[0].arn, null) : try(aws_lb_listener.app[0].arn, null)
+    resource "aws_lb_listener_rule" "api_rule" {
+      count        = var.api ? (try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0) : 0
+      listener_arn = aws_lb_listener.api[0].arn
+      priority     = local.elb.listener.priority
+
+      action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+      }
+
+      dynamic "condition" {
+        for_each = lookup(local.elb.listener, "condition", [])
+        content {
+          dynamic "path_pattern" {
+            for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
+            content {
+              values = path_pattern.value.values
+            }
+          }
+
+          dynamic "host_header" {
+            for_each = lookup(condition.value, "host_header", null) == null ? [] : [condition.value.host_header]
+            content {
+              values = host_header.value.values
+            }
+          }
+        }
+      }
+
+      lifecycle {
+        ignore_changes = [
+          action
+        ]
+      }
+    }
+
+    resource "aws_lb_listener_rule" "app_rule" {
+      count        = var.api ? 0 : (try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0)
+      listener_arn = aws_lb_listener.app[0].arn
       priority     = local.elb.listener.priority
 
       action {
