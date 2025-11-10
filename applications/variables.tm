@@ -41,8 +41,14 @@ generate_hcl "_auto_generated_variables.tf" {
     }
 
     variable "elb" {
-      type = any
+      type        = any
       description = "ELB configuration with listener and health check settings"
+    }
+
+    variable "api" {
+      type        = any
+      description = "API configuration with paths to be create on API Gateway"
+      default     = {}
     }
 
     variable "private_subnets" {
