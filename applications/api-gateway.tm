@@ -102,7 +102,14 @@ generate_hcl "_auto_generated_api-gateway.tf" {
         aws_api_gateway_integration.alb_integration_orders_proxy
       ]
       rest_api_id = aws_api_gateway_rest_api.api[0].id
-      stage_name  = var.environment
+    }
+
+    resource "aws_api_gateway_stage" "example" {
+      count = var.api ? 1 : 0
+
+      deployment_id = aws_api_gateway_deployment.deployment[0].id
+      rest_api_id   = aws_api_gateway_rest_api.api[0].id
+      stage_name    = var.environment
     }
 
     resource "random_password" "api_key" {
