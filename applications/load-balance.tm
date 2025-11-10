@@ -106,7 +106,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
 
       tags = {
-        Name = "${global.environment}-lb-listener-http-api"
+        Name = "${var.environment}-lb-listener-http-api"
       }
     }
 
