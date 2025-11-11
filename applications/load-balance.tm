@@ -1,7 +1,7 @@
 generate_hcl "_auto_generated_load_balance.tf" {
   content {
     locals {
-      alb_defaults = {
+      elb_defaults = {
         health_check = {
           path                = "/"
           interval            = 30
@@ -12,7 +12,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
         }
       }
 
-      alb = merge(local.alb_defaults, var.alb)
+      elb = merge(local.elb_defaults, var.elb)
     }
 
     resource "aws_lb_target_group" "app_lb_service_tg_blue" {
@@ -23,12 +23,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       target_type = "ip"
 
       health_check {
-        path                = local.alb.health_check.path
-        interval            = local.alb.health_check.interval
-        timeout             = local.alb.health_check.timeout
-        healthy_threshold   = local.alb.health_check.healthy_threshold
-        unhealthy_threshold = local.alb.health_check.unhealthy_threshold
-        matcher             = local.alb.health_check.matcher
+        path                = local.elb.health_check.path
+        interval            = local.elb.health_check.interval
+        timeout             = local.elb.health_check.timeout
+        healthy_threshold   = local.elb.health_check.healthy_threshold
+        unhealthy_threshold = local.elb.health_check.unhealthy_threshold
+        matcher             = local.elb.health_check.matcher
       }
 
       tags = {
@@ -45,12 +45,12 @@ generate_hcl "_auto_generated_load_balance.tf" {
       target_type = "ip"
 
       health_check {
-        path                = local.alb.health_check.path
-        interval            = local.alb.health_check.interval
-        timeout             = local.alb.health_check.timeout
-        healthy_threshold   = local.alb.health_check.healthy_threshold
-        unhealthy_threshold = local.alb.health_check.unhealthy_threshold
-        matcher             = local.alb.health_check.matcher
+        path                = local.elb.health_check.path
+        interval            = local.elb.health_check.interval
+        timeout             = local.elb.health_check.timeout
+        healthy_threshold   = local.elb.health_check.healthy_threshold
+        unhealthy_threshold = local.elb.health_check.unhealthy_threshold
+        matcher             = local.elb.health_check.matcher
       }
 
       tags = {
@@ -59,10 +59,10 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
     }
 
-    resource "aws_lb_listener_rule" "rules" {
-      count        = try(length(local.alb.listener.condition), 0) > 0 ? 1 : 0
-      listener_arn = local.alb.listener_arn
-      priority     = local.alb.listener.priority
+    resource "aws_lb_listener_rule" "rule" {
+      count        = try(length(local.elb.listener.condition), 0) > 0 ? 1 : 0
+      listener_arn = tm_ternary(global.api, aws_lb_listener.api[0].arn, aws_lb_listener.app[0].arn)
+      priority     = local.elb.listener.priority
 
       action {
         type             = "forward"
@@ -70,7 +70,7 @@ generate_hcl "_auto_generated_load_balance.tf" {
       }
 
       dynamic "condition" {
-        for_each = lookup(local.alb.listener, "condition", [])
+        for_each = lookup(local.elb.listener, "condition", [])
         content {
           dynamic "path_pattern" {
             for_each = lookup(condition.value, "path_pattern", null) == null ? [] : [condition.value.path_pattern]
@@ -86,6 +86,87 @@ generate_hcl "_auto_generated_load_balance.tf" {
             }
           }
         }
+      }
+
+      lifecycle {
+        ignore_changes = [
+          action
+        ]
+      }
+    }
+
+    resource "aws_lb_listener" "api" {
+      count = global.api ? 1 : 0
+
+      load_balancer_arn = var.elb.alb_arn
+      port              = 80
+      protocol          = "HTTP"
+
+      default_action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.app_lb_service_tg_blue.arn
+      }
+
+      tags = {
+        Name = "${var.environment}-lb-listener-api"
+      }
+    }
+
+    resource "aws_lb_listener" "app" {
+      count = global.api ? 0 : 1
+
+      load_balancer_arn = var.elb.alb_arn
+      port              = 80
+      protocol          = "HTTP"
+
+      default_action {
+        type = "fixed-response"
+        fixed_response {
+          content_type = "text/plain"
+          message_body = "No matching path"
+          status_code  = 404
+        }
+      }
+
+      tags = {
+        Name = "${var.environment}-lb-listener-app"
+      }
+    }
+
+    resource "aws_lb_target_group" "nlb_to_alb" {
+      count = global.api ? 1 : 0
+
+      name        = "${var.app_name}-${var.environment}-nlb-tg"
+      port        = 80
+      protocol    = "TCP"
+      vpc_id      = var.vpc_id
+      target_type = "alb"
+
+      health_check {
+        port = "traffic-port"
+        protocol = "HTTP"
+        path     = "/health"
+      }
+ 
+    }
+
+    resource "aws_lb_target_group_attachment" "alb_target" {
+      count = global.api ? 1 : 0
+
+      target_group_arn = aws_lb_target_group.nlb_to_alb[0].arn
+      target_id        = var.elb.alb_arn
+    }
+
+    resource "aws_lb_listener" "nlb_listener" {
+      count = global.api ? 1 : 0
+
+      load_balancer_arn = var.elb.nlb_arn
+      port              = 80
+      protocol          = "TCP"
+
+      default_action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.nlb_to_alb[0].arn
       }
     }
 

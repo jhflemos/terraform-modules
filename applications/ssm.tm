@@ -5,7 +5,7 @@ generate_hcl "_auto_generated_ssm.tf" {
       length  = 32
       upper   = true
       lower   = true
-      number  = true
+      numeric = true
       special = false
     }
 
